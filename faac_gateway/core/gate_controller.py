@@ -50,6 +50,10 @@ class GateController:
             "online": False
         }
 
+        # Track last status publish time for periodic heartbeat
+        self.last_status_publish = 0
+        self.heartbeat_interval = 5  # Publish status every 5 seconds even if unchanged
+
         # Command queue
         self.command_queue = queue.Queue()
 
@@ -125,15 +129,21 @@ class GateController:
         return self.status.copy()
 
     def _update_status(self, **kwargs):
-        """Update status and trigger callback if changed"""
+        """Update status and trigger callback if changed or heartbeat interval elapsed"""
         changed = False
         for key, value in kwargs.items():
             if key in self.status and self.status[key] != value:
                 self.status[key] = value
                 changed = True
 
-        if changed and self.status_callback:
+        # Check if heartbeat interval has elapsed (force publish even if unchanged)
+        current_time = time.time()
+        heartbeat_due = (current_time - self.last_status_publish) >= self.heartbeat_interval
+
+        # Trigger callback if status changed OR heartbeat is due
+        if (changed or heartbeat_due) and self.status_callback:
             self.status_callback(self.status.copy())
+            self.last_status_publish = current_time
 
     def _run(self):
         """Main control loop"""
