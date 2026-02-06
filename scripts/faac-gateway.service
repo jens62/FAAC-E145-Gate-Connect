@@ -1,0 +1,22 @@
+[Unit]
+Description=FAAC E145 Gate Connect with MQTT
+After=network.target mosquitto.service
+Wants=mosquitto.service
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/opt/faac-gateway
+ExecStart=/usr/bin/python3 /opt/faac-gateway/faac_gateway_mqtt.py -c /opt/faac-gateway/config/config.yaml
+Restart=always
+RestartSec=10
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Give access to serial port
+SupplementaryGroups=dialout
+
+[Install]
+WantedBy=multi-user.target

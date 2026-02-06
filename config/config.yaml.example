@@ -1,0 +1,38 @@
+# FAAC E145 Gate Connect Configuration
+
+# Serial port configuration
+serial:
+  port: /dev/ttyUSB1
+  # baudrate: 9600  # Usually not needed, defaults are fine
+
+# MQTT configuration
+mqtt:
+  enabled: true
+  broker: localhost  # MQTT broker hostname or IP
+  port: 1883         # MQTT broker port (1883 for non-TLS, 8883 for TLS)
+  username: null     # MQTT username (optional)
+  password: null     # MQTT password (optional)
+  client_id: faac_gateway
+  base_topic: faac/gate  # Base topic for all MQTT messages
+  use_tls: false     # Enable TLS encryption
+
+# Topics used (will be prefixed with base_topic):
+# - faac/gate/status - Complete status (JSON)
+# - faac/gate/wing1 - Wing 1 position (0-100)
+# - faac/gate/wing2 - Wing 2 position (0-100)
+# - faac/gate/state - Gate state (OPEN/CLOSED/MOVING/STOPPED/UNKNOWN)
+# - faac/gate/availability - Online/offline status
+# - faac/gate/command - Command input (publish: open/close/stop)
+
+# Web interface configuration
+web:
+  enabled: true
+  host: 0.0.0.0  # Listen on all interfaces
+  port: 5000     # Web interface port
+
+# Logging configuration
+logging:
+  level: INFO  # DEBUG, INFO, WARNING, ERROR
+  show_tx: false  # Show transmitted commands
+  show_rx: false  # Show received raw data
+  show_parser: false  # Show parsed position data

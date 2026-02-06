@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # MQTT Broker (optional - comment out if you have your own)
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_logs:/mosquitto/log
+    restart: unless-stopped
+
+  # FAAC Gateway
+  faac-gateway:
+    build: .
+    container_name: faac-gateway
+    depends_on:
+      - mosquitto
+    devices:
+      - /dev/ttyUSB1:/dev/ttyUSB1  # Update to your serial port
+    volumes:
+      - ./config/config.yaml:/app/config/config.yaml
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Berlin  # Set your timezone
+
+volumes:
+  mosquitto_data:
+  mosquitto_logs:

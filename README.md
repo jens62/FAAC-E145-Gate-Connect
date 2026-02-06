@@ -5,13 +5,64 @@
 
 Open-source Python gateway for FAAC E145 gate controllers with MQTT, OpenHAB, and Home Assistant integration.
 
+## Features
+
+- Control FAAC E145 gates via serial connection
+- Real-time position monitoring (0-100% for both wings)
+- Web interface with live updates
+- **MQTT integration** for home automation
+- Commands: Open, Close, Stop
+- Status publishing: position, state, availability
+- Home Assistant & OpenHAB compatible
+
 ## Quick Start
+
+### Basic Usage (Web UI only)
+
+```bash
+pip install -r requirements.txt
+python3 faac_gateway_standalone.py
+```
+
+Open http://localhost:5000 in your browser.
+
+### With MQTT Support
 
 ```bash
 pip install -r requirements.txt
 cp config/config.yaml.example config/config.yaml
-# Edit config.yaml with your settings
-python3 -m faac_gateway
+# Edit config.yaml with your MQTT broker settings
+python3 faac_gateway_mqtt.py -c config/config.yaml
 ```
 
-See [full documentation](docs/) for details.
+## MQTT Topics
+
+Subscribe to status updates:
+- `faac/gate/status` - Complete status (JSON)
+- `faac/gate/state` - Gate state (OPEN/CLOSED/MOVING/STOPPED)
+- `faac/gate/wing1` - Wing 1 position (0-100%)
+- `faac/gate/wing2` - Wing 2 position (0-100%)
+- `faac/gate/availability` - Connection status (online/offline)
+
+Publish commands:
+- `faac/gate/command` - Send commands: `open`, `close`, `stop`
+
+See [MQTT documentation](docs/MQTT.md) for detailed integration guides.
+
+## Documentation
+
+- [MQTT Integration Guide](docs/MQTT.md) - Home Assistant, OpenHAB, Node-RED
+- [Full Documentation](docs/)
+
+## Examples
+
+```bash
+# Test MQTT functionality
+python3 examples/mqtt_test.py
+
+# Simple status subscriber
+python3 examples/mqtt_simple.py
+
+# Send commands via MQTT
+mosquitto_pub -t 'faac/gate/command' -m 'open'
+```
