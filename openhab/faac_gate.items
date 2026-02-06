@@ -5,13 +5,13 @@
 //
 
 // Main Gate Control as Rollershutter
-// Sends position (0-100) directly to MQTT command topic
-// 0% = closed, 100% = open, any value in between works!
-// IMPORTANT: inverted=true because OpenHAB Rollershutter 0=UP but our gate 0=CLOSED
+// Position values are inverted at the MQTT channel level (see things file)
+// This ensures OpenHAB convention (0=OPEN, 100=CLOSED) is used internally
+// HomeKit, Google, Alexa all work correctly without additional inversion
 Rollershutter Hoftor "Hoftor [%d %%]" <garagedoor> (gGarage) ["GarageDoor"] {
     channel="mqtt:topic:mosquitto:faac_hoftor:position",
-    ga="Rollershutter" [lang="de", inverted=false],
-    homekit="GarageDoorOpener" [inverted=true],
+    ga="Rollershutter" [lang="de],
+    homekit="GarageDoorOpener",
     alexa="Endpoint.Door" [friendlyName="Hoftor", language="de"]
 }
 

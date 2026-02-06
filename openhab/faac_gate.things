@@ -16,12 +16,17 @@ Bridge mqtt:broker:mosquitto "MQTT Broker" [
     Thing topic faac_hoftor "Hoftor (FAAC)" @ "Hof" {
         Channels:
             // Rollershutter channel - sends position (0-100) to MQTT
-            // Gate controller automatically handles position control
+            // IMPORTANT: Transforms incoming values to match OpenHAB convention
+            // Hardware: 0=CLOSED, 100=OPEN
+            // OpenHAB: 0=OPEN, 100=CLOSED
+            // So we invert: incoming 0 becomes 100, incoming 100 becomes 0
             Type rollershutter : position "Gate Position" [
                 commandTopic="faac/gate/command",
                 stateTopic="faac/gate/wing1",
-                on="100",
-                off="0",
+                transformationPattern="JS:invert.js",
+                transformationPatternOut="JS:invert.js",
+                on="0",
+                off="100",
                 retained=false
             ]
 
