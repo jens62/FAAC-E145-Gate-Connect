@@ -16,11 +16,7 @@
 Rollershutter Hoftor "Hoftor [%d %%]" <rollershutter> (gGarage) ["WindowCovering"] {
     channel="mqtt:topic:mosquitto:faac_hoftor:position",
     ga="Rollershutter" [lang="de", inverted=false],
-    homekit="WindowCovering" [
-        WindowCovering.CurrentPosition="wing1",
-        WindowCovering.TargetPosition="CONTROL",
-        WindowCovering.PositionState="DYNAMIC"
-    ],
+    homekit="WindowCovering,WindowCovering.currentPosition",
     alexa="Endpoint.Blind" [
         friendlyName="Hoftor",
         language="de"

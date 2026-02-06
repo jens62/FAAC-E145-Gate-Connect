@@ -10,7 +10,7 @@
 Rollershutter Hoftor "Hoftor [%d %%]" <garagedoor> (gGarage) ["GarageDoor"] {
     channel="mqtt:topic:mosquitto:faac_hoftor:position",
     ga="Rollershutter" [lang="de", inverted=false],
-    homekit="GarageDoorOpener" [inverted=false],
+    homekit="GarageDoorOpener",
     alexa="Endpoint.Door" [friendlyName="Hoftor", language="de"]
 }
 
