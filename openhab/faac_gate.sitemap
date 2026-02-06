@@ -33,8 +33,11 @@ sitemap faac_gate label="Hoftor Steuerung" {
             Hoftor_Availability=="offline"="red"
         ]
 
-        // Last heartbeat timestamp
-        Text item=Hoftor_LastSeen label="Letzter Kontakt [%1$td.%1$tm. %1$tH:%1$tM:%1$tS]" icon="time" visibility=[Hoftor_Availability=="offline"]
+        // Server heartbeat - shows if OpenHAB is receiving data from MQTT server
+        Text item=Hoftor_ServerHeartbeat label="Server [%1$td.%1$tm. %1$tH:%1$tM:%1$tS]" icon="time"
+
+        // Gate last seen - shows when gate (USB) last responded
+        Text item=Hoftor_GateLastSeen label="Tor (USB) [%1$td.%1$tm. %1$tH:%1$tM:%1$tS]" icon="time"
     }
 
     Frame label="Positionsverlauf" {

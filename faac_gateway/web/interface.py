@@ -258,10 +258,24 @@ def create_app(gate_controller, mqtt_enabled=False):
         }};
 
         let lastUpdateTime = Date.now();
+        let sseConnected = false;
+
+        source.onopen = function() {{
+            sseConnected = true;
+            console.log("SSE connection established");
+        }};
+
+        source.onerror = function(e) {{
+            sseConnected = false;
+            console.error("SSE connection error", e);
+            document.getElementById("lastUpdate").textContent = "Connection lost - Reconnecting...";
+            document.getElementById("lastUpdate").classList.add("stale");
+        }};
 
         source.onmessage = function(e) {{
             const d = JSON.parse(e.data);
             lastUpdateTime = Date.now();
+            sseConnected = true;
 
             const stateEl = document.getElementById("state");
             stateEl.innerHTML = '<span class="status-heart">❤</span>' + d.state;
@@ -281,15 +295,18 @@ def create_app(gate_controller, mqtt_enabled=False):
 
         // Update "last seen" timestamp every second
         setInterval(function() {{
+            // Don't update if SSE connection is broken (error handler shows reconnect message)
+            if (!sseConnected) return;
+
             const elapsed = Math.floor((Date.now() - lastUpdateTime) / 1000);
             const lastUpdateEl = document.getElementById("lastUpdate");
 
-            if (elapsed < 3) {{
+            if (elapsed < 15) {{
                 lastUpdateEl.textContent = "Live";
                 lastUpdateEl.classList.remove("stale");
             }} else if (elapsed < 60) {{
                 lastUpdateEl.textContent = "Last update: " + elapsed + "s ago";
-                lastUpdateEl.classList.toggle("stale", elapsed > 10);
+                lastUpdateEl.classList.add("stale");
             }} else {{
                 const minutes = Math.floor(elapsed / 60);
                 lastUpdateEl.textContent = "Last update: " + minutes + "m ago";

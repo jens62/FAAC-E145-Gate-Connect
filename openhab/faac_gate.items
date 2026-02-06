@@ -38,7 +38,12 @@ String Hoftor_Availability "Hoftor Verfügbarkeit [%s]" <network> (gGarage) {
     channel="mqtt:topic:mosquitto:faac_hoftor:availability"
 }
 
-// Last seen timestamp (heartbeat)
-DateTime Hoftor_LastSeen "Letzter Kontakt [%1$td.%1$tm.%1$tY %1$tH:%1$tM:%1$tS]" <time> (gGarage) {
-    channel="mqtt:topic:mosquitto:faac_hoftor:last_seen"
+// Server heartbeat - when did MQTT server last publish
+DateTime Hoftor_ServerHeartbeat "Server Heartbeat [%1$td.%1$tm. %1$tH:%1$tM:%1$tS]" <time> (gGarage) {
+    channel="mqtt:topic:mosquitto:faac_hoftor:server_heartbeat"
+}
+
+// Gate last seen - when did gate (USB) last respond
+DateTime Hoftor_GateLastSeen "Tor zuletzt gesehen [%1$td.%1$tm. %1$tH:%1$tM:%1$tS]" <time> (gGarage) {
+    channel="mqtt:topic:mosquitto:faac_hoftor:gate_last_seen"
 }

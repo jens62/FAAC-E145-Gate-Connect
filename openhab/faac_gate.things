@@ -51,9 +51,15 @@ Bridge mqtt:broker:mosquitto "MQTT Broker" [
                 retained=true
             ]
 
-            // Last seen timestamp - when was the last heartbeat
-            Type datetime : last_seen "Last Seen" [
-                stateTopic="faac/gate/last_seen",
+            // Server heartbeat - when did server last publish (regardless of gate status)
+            Type datetime : server_heartbeat "Server Heartbeat" [
+                stateTopic="faac/gate/server_heartbeat",
+                retained=true
+            ]
+
+            // Gate last seen - when did gate (USB) last respond with data
+            Type datetime : gate_last_seen "Gate Last Seen" [
+                stateTopic="faac/gate/gate_last_seen",
                 retained=true
             ]
     }

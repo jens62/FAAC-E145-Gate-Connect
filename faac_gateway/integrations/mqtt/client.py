@@ -48,7 +48,8 @@ class MQTTClient:
         self.wing2_topic = f"{self.base_topic}/wing2"
         self.state_topic = f"{self.base_topic}/state"
         self.availability_topic = f"{self.base_topic}/availability"
-        self.last_seen_topic = f"{self.base_topic}/last_seen"
+        self.server_heartbeat_topic = f"{self.base_topic}/server_heartbeat"
+        self.gate_last_seen_topic = f"{self.base_topic}/gate_last_seen"
         self.command_topic = f"{self.base_topic}/command"
 
         # Callback for commands
@@ -173,7 +174,7 @@ class MQTTClient:
 
     def publish_status(self, status: Dict[str, Any]):
         """
-        Publish complete gate status and update last seen timestamp
+        Publish complete gate status and update heartbeat timestamps
 
         Args:
             status: Dictionary with keys: wing1, wing2, state, online
@@ -182,6 +183,8 @@ class MQTTClient:
             return
 
         try:
+            timestamp = datetime.now().isoformat()
+
             # Publish complete status as JSON
             self.client.publish(
                 self.status_topic,
@@ -212,26 +215,37 @@ class MQTTClient:
                 retain=True
             )
 
-            # Update last seen timestamp (heartbeat)
-            timestamp = datetime.now().isoformat()
+            # Server heartbeat - shows server is alive and publishing
             self.client.publish(
-                self.last_seen_topic,
+                self.server_heartbeat_topic,
                 payload=timestamp,
                 qos=1,
                 retain=True
             )
+
+            # Gate last seen - shows when gate (USB) last responded
+            # Only update if gate is online (has valid data)
+            if status.get('online', False):
+                self.client.publish(
+                    self.gate_last_seen_topic,
+                    payload=timestamp,
+                    qos=1,
+                    retain=True
+                )
 
         except Exception as e:
             logger.error(f"Error publishing status: {e}")
 
     def publish_availability(self, status: str):
         """
-        Publish availability status and last seen timestamp
+        Publish availability status and server heartbeat
 
         Args:
             status: "online" or "offline"
         """
         try:
+            timestamp = datetime.now().isoformat()
+
             # Publish availability status
             self.client.publish(
                 self.availability_topic,
@@ -240,10 +254,9 @@ class MQTTClient:
                 retain=True
             )
 
-            # Publish last seen timestamp (ISO 8601 format)
-            timestamp = datetime.now().isoformat()
+            # Publish server heartbeat (shows server is alive)
             self.client.publish(
-                self.last_seen_topic,
+                self.server_heartbeat_topic,
                 payload=timestamp,
                 qos=1,
                 retain=True
