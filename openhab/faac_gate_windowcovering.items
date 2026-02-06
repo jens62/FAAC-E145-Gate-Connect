@@ -1,0 +1,48 @@
+//
+// FAAC Gate - OpenHAB Items Configuration (WindowCovering variant)
+// Using HomeKit WindowCovering instead of GarageDoorOpener
+// NO RULES NEEDED - Direct MQTT position control!
+//
+// This variant uses WindowCovering which:
+// - Works like rollershutters/blinds
+// - No security prompts in HomeKit
+// - Better for "Rolladen" style voice commands
+// - Simpler HomeKit interface
+//
+
+// Main Gate Control as Rollershutter with WindowCovering
+// Sends position (0-100) directly to MQTT command topic
+// 0% = closed, 100% = open, any value in between works!
+Rollershutter Hoftor "Hoftor [%d %%]" <rollershutter> (gGarage) ["WindowCovering"] {
+    channel="mqtt:topic:mosquitto:faac_hoftor:position",
+    ga="Rollershutter" [lang="de", inverted=false],
+    homekit="WindowCovering" [
+        WindowCovering.CurrentPosition="wing1",
+        WindowCovering.TargetPosition="CONTROL",
+        WindowCovering.PositionState="DYNAMIC"
+    ],
+    alexa="Endpoint.Blind" [
+        friendlyName="Hoftor",
+        language="de"
+    ]
+}
+
+// Wing 1 position for detailed monitoring
+Number Hoftor_Wing1 "Hoftor Flügel 1 [%d %%]" <chart> (gGarage) {
+    channel="mqtt:topic:mosquitto:faac_hoftor:wing1"
+}
+
+// Wing 2 position for detailed monitoring
+Number Hoftor_Wing2 "Hoftor Flügel 2 [%d %%]" <chart> (gGarage) {
+    channel="mqtt:topic:mosquitto:faac_hoftor:wing2"
+}
+
+// Gate state (OPEN, CLOSED, MOVING, STOPPED, UNKNOWN)
+String Hoftor_State "Hoftor Status [%s]" <status> (gGarage) {
+    channel="mqtt:topic:mosquitto:faac_hoftor:state"
+}
+
+// Gate availability (online/offline)
+String Hoftor_Availability "Hoftor Verfügbarkeit [%s]" <network> (gGarage) {
+    channel="mqtt:topic:mosquitto:faac_hoftor:availability"
+}

@@ -13,11 +13,25 @@ Complete OpenHAB configuration for controlling the FAAC E145 gate via MQTT with 
 ## 📁 Files
 
 - **`faac_gate.things`** - MQTT broker and gate device configuration
-- **`faac_gate.items`** - Item definitions with HomeKit metadata
-- **`faac_gate.sitemap`** - Visual interface with position display
+- **`faac_gate.items`** - Item definitions with HomeKit GarageDoorOpener
+- **`faac_gate_windowcovering.items`** - Alternative: HomeKit WindowCovering ⭐ **Recommended!**
+- **`faac_gate.sitemap`** - Visual interface with position slider
 - **`README.md`** - This file
 
 **🎉 NO RULES FILE NEEDED!** Position control is handled automatically by the FAAC gateway.
+
+### 🔄 Two HomeKit Variants
+
+**Option 1: GarageDoorOpener** (`faac_gate.items`)
+- Shows as "Garage Door" in Home app
+- Has security confirmation prompts when opening
+- Good if you want extra security
+
+**Option 2: WindowCovering** (`faac_gate_windowcovering.items`) ⭐ **Recommended**
+- Shows as "Rolladen/Blind" in Home app
+- No security prompts - direct control
+- Better for rollershutter-style voice commands
+- Simpler and faster to use
 
 ## 🚀 Quick Setup
 
@@ -32,6 +46,20 @@ Settings → Bindings → Install:
 
 ### 2. Copy Configuration Files
 
+**Choose your HomeKit variant:**
+
+**Option A: WindowCovering** ⭐ **Recommended - No security prompts**
+```bash
+sudo cp faac_gate.things /etc/openhab/things/
+sudo cp faac_gate_windowcovering.items /etc/openhab/items/faac_gate.items
+sudo cp faac_gate.sitemap /etc/openhab/sitemaps/
+
+sudo chown openhab:openhab /etc/openhab/things/faac_gate.things
+sudo chown openhab:openhab /etc/openhab/items/faac_gate.items
+sudo chown openhab:openhab /etc/openhab/sitemaps/faac_gate.sitemap
+```
+
+**Option B: GarageDoorOpener** (with security confirmation prompts)
 ```bash
 sudo cp faac_gate.things /etc/openhab/things/
 sudo cp faac_gate.items /etc/openhab/items/
@@ -73,12 +101,20 @@ sudo systemctl restart openhab
 
 ### Siri/HomeKit
 
+**With WindowCovering** ⭐ (Recommended - No security prompts):
 - **"Hey Siri, öffne Hoftor"** - Opens gate to 100%
 - **"Hey Siri, schließe Hoftor"** - Closes gate to 0%
 - **"Hey Siri, stoppe Hoftor"** - Stops gate movement
 - **"Hey Siri, öffne Hoftor zu 30%"** - Opens to exactly 30%! ✨
 - **"Hey Siri, stelle Hoftor auf 50%"** - Sets to 50%
-- **"Hey Siri, ist Hoftor offen?"** - Checks gate status
+- **"Hey Siri, fahre Hoftor hoch"** - Opens (rollershutter style)
+- **"Hey Siri, fahre Hoftor runter"** - Closes (rollershutter style)
+- **"Hey Siri, wie weit ist Hoftor geöffnet?"** - Checks position
+
+**With GarageDoorOpener:**
+- Same commands work
+- **But:** Security confirmation prompt appears when opening
+- Shows as "Garage Door" in Home app
 
 ### Alexa
 
