@@ -7,6 +7,7 @@ import json
 import logging
 import paho.mqtt.client as mqtt
 from typing import Callable, Optional, Dict, Any
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,7 @@ class MQTTClient:
         self.wing2_topic = f"{self.base_topic}/wing2"
         self.state_topic = f"{self.base_topic}/state"
         self.availability_topic = f"{self.base_topic}/availability"
+        self.last_seen_topic = f"{self.base_topic}/last_seen"
         self.command_topic = f"{self.base_topic}/command"
 
         # Callback for commands
@@ -171,7 +173,7 @@ class MQTTClient:
 
     def publish_status(self, status: Dict[str, Any]):
         """
-        Publish complete gate status
+        Publish complete gate status and update last seen timestamp
 
         Args:
             status: Dictionary with keys: wing1, wing2, state, online
@@ -210,20 +212,39 @@ class MQTTClient:
                 retain=True
             )
 
+            # Update last seen timestamp (heartbeat)
+            timestamp = datetime.now().isoformat()
+            self.client.publish(
+                self.last_seen_topic,
+                payload=timestamp,
+                qos=1,
+                retain=True
+            )
+
         except Exception as e:
             logger.error(f"Error publishing status: {e}")
 
     def publish_availability(self, status: str):
         """
-        Publish availability status
+        Publish availability status and last seen timestamp
 
         Args:
             status: "online" or "offline"
         """
         try:
+            # Publish availability status
             self.client.publish(
                 self.availability_topic,
                 payload=status,
+                qos=1,
+                retain=True
+            )
+
+            # Publish last seen timestamp (ISO 8601 format)
+            timestamp = datetime.now().isoformat()
+            self.client.publish(
+                self.last_seen_topic,
+                payload=timestamp,
                 qos=1,
                 retain=True
             )

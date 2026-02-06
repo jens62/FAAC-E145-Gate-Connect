@@ -32,6 +32,9 @@ sitemap faac_gate label="Hoftor Steuerung" {
             Hoftor_Availability=="online"="green",
             Hoftor_Availability=="offline"="red"
         ]
+
+        // Last heartbeat timestamp
+        Text item=Hoftor_LastSeen label="Letzter Kontakt [%1$td.%1$tm. %1$tH:%1$tM:%1$tS]" icon="time" visibility=[Hoftor_Availability=="offline"]
     }
 
     Frame label="Positionsverlauf" {

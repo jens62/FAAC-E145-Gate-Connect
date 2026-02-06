@@ -37,3 +37,8 @@ String Hoftor_State "Hoftor Status [%s]" <status> (gGarage) {
 String Hoftor_Availability "Hoftor Verfügbarkeit [%s]" <network> (gGarage) {
     channel="mqtt:topic:mosquitto:faac_hoftor:availability"
 }
+
+// Last seen timestamp (heartbeat)
+DateTime Hoftor_LastSeen "Letzter Kontakt [%1$td.%1$tm.%1$tY %1$tH:%1$tM:%1$tS]" <time> (gGarage) {
+    channel="mqtt:topic:mosquitto:faac_hoftor:last_seen"
+}

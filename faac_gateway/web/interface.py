@@ -170,17 +170,27 @@ def create_app(gate_controller, mqtt_enabled=False):
         .btn-stop:hover {{
             background: linear-gradient(135deg, #616161 0%, #757575 100%);
         }}
-        .status-dot {{
+        .status-heart {{
             display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
             margin-right: 8px;
-            animation: pulse 2s infinite;
+            font-size: 0.8em;
+            animation: heartbeat 1.5s ease-in-out infinite;
         }}
-        @keyframes pulse {{
-            0%, 100% {{ opacity: 1; }}
-            50% {{ opacity: 0.5; }}
+        @keyframes heartbeat {{
+            0%, 100% {{ transform: scale(1); }}
+            10% {{ transform: scale(1.2); }}
+            20% {{ transform: scale(1); }}
+            30% {{ transform: scale(1.2); }}
+            40% {{ transform: scale(1); }}
+        }}
+        .last-update {{
+            font-size: 0.7em;
+            opacity: 0.6;
+            text-align: center;
+            margin-top: 8px;
+        }}
+        .stale {{
+            opacity: 0.3;
         }}
         .footer {{
             text-align: center;
@@ -195,8 +205,9 @@ def create_app(gate_controller, mqtt_enabled=False):
         <div class="header">
             <div class="version">FAAC Monitor{title_suffix}</div>
             <div id="state">
-                <span class="status-dot"></span>LOADING...
+                <span class="status-heart">❤</span>LOADING...
             </div>
+            <div class="last-update" id="lastUpdate">Connecting...</div>
         </div>
 
         <div class="wing">
@@ -246,15 +257,18 @@ def create_app(gate_controller, mqtt_enabled=False):
             "UNKNOWN": "#757575"
         }};
 
+        let lastUpdateTime = Date.now();
+
         source.onmessage = function(e) {{
             const d = JSON.parse(e.data);
+            lastUpdateTime = Date.now();
 
             const stateEl = document.getElementById("state");
-            stateEl.innerHTML = '<span class="status-dot"></span>' + d.state;
+            stateEl.innerHTML = '<span class="status-heart">❤</span>' + d.state;
 
             const color = stateColors[d.state] || "#757575";
             stateEl.style.color = color;
-            document.querySelector(".status-dot").style.backgroundColor = color;
+            document.querySelector(".status-heart").style.color = color;
 
             document.getElementById("w1v").innerText = d.wing1;
             document.getElementById("w1b").style.width = d.wing1 + "%";
@@ -264,6 +278,24 @@ def create_app(gate_controller, mqtt_enabled=False):
             document.getElementById("w2b").style.width = d.wing2 + "%";
             document.getElementById("w2b").style.backgroundColor = color;
         }};
+
+        // Update "last seen" timestamp every second
+        setInterval(function() {{
+            const elapsed = Math.floor((Date.now() - lastUpdateTime) / 1000);
+            const lastUpdateEl = document.getElementById("lastUpdate");
+
+            if (elapsed < 3) {{
+                lastUpdateEl.textContent = "Live";
+                lastUpdateEl.classList.remove("stale");
+            }} else if (elapsed < 60) {{
+                lastUpdateEl.textContent = "Last update: " + elapsed + "s ago";
+                lastUpdateEl.classList.toggle("stale", elapsed > 10);
+            }} else {{
+                const minutes = Math.floor(elapsed / 60);
+                lastUpdateEl.textContent = "Last update: " + minutes + "m ago";
+                lastUpdateEl.classList.add("stale");
+            }}
+        }}, 1000);
 
         function sendCmd(cmd) {{
             fetch('/action/' + cmd)
