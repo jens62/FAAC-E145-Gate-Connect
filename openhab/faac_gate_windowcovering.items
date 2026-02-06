@@ -13,10 +13,11 @@
 // Main Gate Control as Rollershutter with WindowCovering
 // Sends position (0-100) directly to MQTT command topic
 // 0% = closed, 100% = open, any value in between works!
+// IMPORTANT: inverted=true because OpenHAB Rollershutter 0=UP but our gate 0=CLOSED
 Rollershutter Hoftor "Hoftor [%d %%]" <rollershutter> (gGarage) ["WindowCovering"] {
     channel="mqtt:topic:mosquitto:faac_hoftor:position",
     ga="Rollershutter" [lang="de", inverted=false],
-    homekit="WindowCovering,WindowCovering.currentPosition",
+    homekit="WindowCovering" [inverted=true],
     alexa="Endpoint.Blind" [
         friendlyName="Hoftor",
         language="de"
