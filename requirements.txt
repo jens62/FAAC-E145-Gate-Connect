@@ -1,0 +1,4 @@
+# Core dependencies
+flask>=2.3.0
+pyyaml>=6.0
+paho-mqtt>=1.6.1
