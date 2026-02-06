@@ -113,16 +113,26 @@ class MQTTClient:
                 try:
                     position = int(command)
                     if 0 <= position <= 100:
-                        # Valid position command
-                        if self.command_callback:
-                            self.command_callback(str(position))
+                        # Map extreme positions to text commands for limit switch accuracy
+                        # This ensures HomeKit/voice "Open" and "Close" commands
+                        # run the gate to limit switches instead of stopping at ~99% or ~1%
+                        if position == 0:
+                            command = "close"
+                            logger.info(f"Position 0 mapped to 'close' command")
+                        elif position == 100:
+                            command = "open"
+                            logger.info(f"Position 100 mapped to 'open' command")
                         else:
-                            logger.warning("No command callback registered")
-                        return
+                            # Partial position (1-99%) - use position control
+                            if self.command_callback:
+                                self.command_callback(str(position))
+                            else:
+                                logger.warning("No command callback registered")
+                            return
                 except (ValueError, TypeError):
                     pass
 
-                # Not a position, check if it's a valid command
+                # Handle text commands (including mapped positions)
                 command_lower = command.lower()
                 if command_lower in ['open', 'close', 'stop']:
                     if self.command_callback:

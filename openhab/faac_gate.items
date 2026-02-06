@@ -3,14 +3,17 @@
 // Items with HomeKit integration for voice control
 // NO RULES NEEDED - Direct MQTT position control!
 //
+// Server-side intelligent command mapping:
+// - 0% / 100% → Mapped to "close"/"open" → Runs to limit switches
+// - 1-99% → Position control → Accurate positioning
+//
 
 // Main Gate Control as Rollershutter
 // Position values are inverted at the MQTT channel level (see things file)
-// This ensures OpenHAB convention (0=OPEN, 100=CLOSED) is used internally
 // HomeKit, Google, Alexa all work correctly without additional inversion
 Rollershutter Hoftor "Hoftor [%d %%]" <garagedoor> (gGarage) ["GarageDoor"] {
     channel="mqtt:topic:mosquitto:faac_hoftor:position",
-    ga="Rollershutter" [lang="de],
+    ga="Rollershutter" [lang="de"],
     homekit="GarageDoorOpener",
     alexa="Endpoint.Door" [friendlyName="Hoftor", language="de"]
 }
