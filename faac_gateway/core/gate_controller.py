@@ -53,6 +53,11 @@ class GateController:
         # Command queue
         self.command_queue = queue.Queue()
 
+        # Position control
+        self.target_position = None
+        self.position_control_active = False
+        self.position_tolerance = 2  # Stop within ±2% of target
+
         # Control flags
         self._running = False
         self._thread = None
@@ -80,12 +85,40 @@ class GateController:
         Queue a command to be sent to the gate
 
         Args:
-            command: Command to send (open, close, stop)
+            command: Command to send (open, close, stop) or position (0-100)
         """
+        # Check if it's a position command (numeric 0-100)
+        try:
+            position = int(command)
+            if 0 <= position <= 100:
+                self.send_position(position)
+                return
+        except (ValueError, TypeError):
+            pass
+
+        # It's a regular command
         if FaacProtocol.validate_command(command):
+            # Cancel any active position control
+            self.position_control_active = False
+            self.target_position = None
             self.command_queue.put(command.lower())
         else:
             logger.warning(f"Invalid command: {command}")
+
+    def send_position(self, position: int):
+        """
+        Move gate to specific position (0-100%)
+
+        Args:
+            position: Target position (0=closed, 100=open)
+        """
+        if not 0 <= position <= 100:
+            logger.warning(f"Invalid position: {position}. Must be 0-100.")
+            return
+
+        self.target_position = position
+        self.position_control_active = True
+        logger.info(f"Moving gate to position {position}%")
 
     def get_status(self) -> Dict[str, Any]:
         """Get current gate status"""
@@ -138,6 +171,37 @@ class GateController:
                             time.sleep(0.5)
                         else:
                             logger.warning(f"Unknown command: {cmd_type}")
+
+                    # 1b. POSITION CONTROL - Automatically move to target position
+                    if self.position_control_active and self.target_position is not None:
+                        current_pos = self.status["wing1"]
+                        target = self.target_position
+                        tolerance = self.position_tolerance
+
+                        # Check if we've reached the target
+                        if abs(current_pos - target) <= tolerance:
+                            # Target reached - send stop
+                            logger.info(f"Target position {target}% reached (current: {current_pos}%)")
+                            os.write(fd, bytes.fromhex(FaacProtocol.COMMANDS["stop"]))
+                            self.position_control_active = False
+                            self.target_position = None
+                            time.sleep(0.5)
+                        else:
+                            # Not at target yet - check if we need to start/continue movement
+                            state = self.status["state"]
+
+                            if current_pos < target:
+                                # Need to open more
+                                if state != "MOVING" or state == "STOPPED":
+                                    logger.debug(f"Position control: opening (current={current_pos}%, target={target}%)")
+                                    os.write(fd, bytes.fromhex(FaacProtocol.COMMANDS["open"]))
+                                    time.sleep(0.5)
+                            elif current_pos > target:
+                                # Need to close more
+                                if state != "MOVING" or state == "STOPPED":
+                                    logger.debug(f"Position control: closing (current={current_pos}%, target={target}%)")
+                                    os.write(fd, bytes.fromhex(FaacProtocol.COMMANDS["close"]))
+                                    time.sleep(0.5)
 
                     # 2. POLL - Query status
                     os.write(fd, bytes.fromhex(FaacProtocol.POLL_CMD))

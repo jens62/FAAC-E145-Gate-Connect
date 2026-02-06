@@ -1,0 +1,35 @@
+//
+// FAAC Gate - OpenHAB Items Configuration
+// Items with HomeKit integration for voice control
+// NO RULES NEEDED - Direct MQTT position control!
+//
+
+// Main Gate Control as Rollershutter
+// Sends position (0-100) directly to MQTT command topic
+// 0% = closed, 100% = open, any value in between works!
+Rollershutter Hoftor "Hoftor [%d %%]" <garagedoor> (gGarage) ["GarageDoor"] {
+    channel="mqtt:topic:mosquitto:faac_hoftor:position",
+    ga="Rollershutter" [lang="de", inverted=false],
+    homekit="GarageDoorOpener" [inverted=false],
+    alexa="Endpoint.Door" [friendlyName="Hoftor", language="de"]
+}
+
+// Wing 1 position for detailed monitoring
+Number Hoftor_Wing1 "Hoftor Flügel 1 [%d %%]" <chart> (gGarage) {
+    channel="mqtt:topic:mosquitto:faac_hoftor:wing1"
+}
+
+// Wing 2 position for detailed monitoring
+Number Hoftor_Wing2 "Hoftor Flügel 2 [%d %%]" <chart> (gGarage) {
+    channel="mqtt:topic:mosquitto:faac_hoftor:wing2"
+}
+
+// Gate state (OPEN, CLOSED, MOVING, STOPPED, UNKNOWN)
+String Hoftor_State "Hoftor Status [%s]" <status> (gGarage) {
+    channel="mqtt:topic:mosquitto:faac_hoftor:state"
+}
+
+// Gate availability (online/offline)
+String Hoftor_Availability "Hoftor Verfügbarkeit [%s]" <network> (gGarage) {
+    channel="mqtt:topic:mosquitto:faac_hoftor:availability"
+}

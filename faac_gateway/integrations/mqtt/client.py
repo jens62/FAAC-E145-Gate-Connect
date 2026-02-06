@@ -106,13 +106,27 @@ class MQTTClient:
         """Callback when message is received"""
         try:
             if msg.topic == self.command_topic:
-                command = msg.payload.decode('utf-8').lower().strip()
+                command = msg.payload.decode('utf-8').strip()
                 logger.info(f"Received command: {command}")
 
-                # Validate command
-                if command in ['open', 'close', 'stop']:
+                # Try to parse as position (0-100)
+                try:
+                    position = int(command)
+                    if 0 <= position <= 100:
+                        # Valid position command
+                        if self.command_callback:
+                            self.command_callback(str(position))
+                        else:
+                            logger.warning("No command callback registered")
+                        return
+                except (ValueError, TypeError):
+                    pass
+
+                # Not a position, check if it's a valid command
+                command_lower = command.lower()
+                if command_lower in ['open', 'close', 'stop']:
                     if self.command_callback:
-                        self.command_callback(command)
+                        self.command_callback(command_lower)
                     else:
                         logger.warning("No command callback registered")
                 else:

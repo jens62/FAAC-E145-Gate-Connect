@@ -1,0 +1,52 @@
+//
+// FAAC Gate - OpenHAB Things Configuration
+// MQTT connection and gate device (NO RULES NEEDED!)
+//
+
+Bridge mqtt:broker:mosquitto "MQTT Broker" [
+    host="localhost",
+    port=1883,
+    secure=false,
+    clientID="openhab_faac_gate"
+    // username="your_username",
+    // password="your_password"
+] {
+
+    // FAAC Gate Thing
+    Thing topic faac_hoftor "Hoftor (FAAC)" @ "Hof" {
+        Channels:
+            // Rollershutter channel - sends position (0-100) to MQTT
+            // Gate controller automatically handles position control
+            Type rollershutter : position "Gate Position" [
+                commandTopic="faac/gate/command",
+                stateTopic="faac/gate/wing1",
+                on="100",
+                off="0",
+                retained=false
+            ]
+
+            // State channel - current gate state
+            Type string : state "Gate State" [
+                stateTopic="faac/gate/state",
+                retained=true
+            ]
+
+            // Wing 1 position (Master) - 0-100%
+            Type number : wing1 "Wing 1 Position" [
+                stateTopic="faac/gate/wing1",
+                retained=true
+            ]
+
+            // Wing 2 position (Slave) - 0-100%
+            Type number : wing2 "Wing 2 Position" [
+                stateTopic="faac/gate/wing2",
+                retained=true
+            ]
+
+            // Availability - online/offline
+            Type string : availability "Gate Availability" [
+                stateTopic="faac/gate/availability",
+                retained=true
+            ]
+    }
+}
