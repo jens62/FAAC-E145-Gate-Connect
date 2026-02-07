@@ -71,6 +71,23 @@ def setup_logging(config):
     # Minimize Flask logs
     logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
+    # Filter out harmless client disconnect errors
+    # These occur when web browsers/clients disconnect while server is sending data
+    # Common with SSE (Server-Sent Events) connections in the web interface
+    class ClientDisconnectFilter(logging.Filter):
+        """Suppress expected client disconnect errors"""
+        def filter(self, record):
+            msg = str(record.msg)
+            # Suppress timeout/disconnect errors (expected when clients close browsers)
+            suppress_patterns = [
+                'Connection timed out',  # errno 110 - client didn't respond
+                'Broken pipe',            # errno 32 - client closed connection
+                'Connection reset by peer' # errno 104 - client forcibly closed
+            ]
+            return not any(pattern in msg for pattern in suppress_patterns)
+
+    logging.getLogger('werkzeug').addFilter(ClientDisconnectFilter())
+
 
 def main():
     """Main entry point"""
