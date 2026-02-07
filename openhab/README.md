@@ -105,18 +105,18 @@ sudo systemctl restart openhab
 **With WindowCovering** ⭐ (Recommended - No security prompts):
 - **"Hey Siri, öffne Hoftor"** - Opens gate to 100%
 - **"Hey Siri, schließe Hoftor"** - Closes gate to 0%
-- **"Hey Siri, stoppe Hoftor"** - Stops gate movement
 - **"Hey Siri, öffne Hoftor zu 30%"** - Opens to exactly 30%! ✨
 - **"Hey Siri, stelle Hoftor auf 50%"** - Sets to 50%
 - **"Hey Siri, fahre Hoftor hoch"** - Opens (rollershutter style)
 - **"Hey Siri, fahre Hoftor runter"** - Closes (rollershutter style)
 - **"Hey Siri, wie weit ist Hoftor geöffnet?"** - Checks position
 
-**🎯 HomeKit-Style Stop** (Like Eve, Somfy, Shelly, Fibaro):
+**🎯 How to Stop** (HomeKit has no "Stop" command):
 - **Gate is opening** → Say **"Öffne Hoftor"** again → **Stops!** 🛑
 - **Gate is closing** → Say **"Schließe Hoftor"** again → **Stops!** 🛑
 - **In Home app:** Tap "Open" while opening → Stops
 - **In Home app:** Tap "Close" while closing → Stops
+- Works like professional HomeKit devices (Eve, Somfy, Shelly, Fibaro)
 
 **With GarageDoorOpener:**
 - Same commands work
