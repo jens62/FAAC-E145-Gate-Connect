@@ -17,11 +17,13 @@ Bridge mqtt:broker:mosquitto "MQTT Broker" [
         Channels:
             // Rollershutter channel - handles everything!
             // UP/DOWN → 0%/100% → Server maps to "open"/"close" → Limit switches
+            // STOP → "stop" → Immediate stop
             // Positions 1-99% → Position control → Accurate positioning
             // Automatically inverts values for OpenHAB convention
             Type rollershutter : position "Gate Position" [
                 commandTopic="faac/gate/command",
                 stateTopic="faac/gate/wing1",
+                stop="stop",
                 transformationPattern="JS:invert.js",
                 transformationPatternOut="JS:invert.js",
                 retained=false
