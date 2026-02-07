@@ -153,7 +153,6 @@ def create_app(gate_controller, mqtt_enabled=False):
         }}
         .btn-open {{
             background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%);
-            grid-column: span 2;
         }}
         .btn-open:hover {{
             background: linear-gradient(135deg, #388e3c 0%, #43a047 100%);
@@ -166,14 +165,25 @@ def create_app(gate_controller, mqtt_enabled=False):
         }}
         .btn-stop {{
             background: linear-gradient(135deg, #424242 0%, #616161 100%);
+            grid-column: span 2;
         }}
         .btn-stop:hover {{
             background: linear-gradient(135deg, #616161 0%, #757575 100%);
         }}
+        .last-update {{
+            font-size: 0.7em;
+            opacity: 0.6;
+            text-align: center;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }}
         .status-heart {{
             display: inline-block;
-            margin-right: 8px;
-            font-size: 0.8em;
+            color: #ef5350;
+            font-size: 0.7em;
             animation: heartbeat 1.5s ease-in-out infinite;
         }}
         @keyframes heartbeat {{
@@ -182,12 +192,6 @@ def create_app(gate_controller, mqtt_enabled=False):
             20% {{ transform: scale(1); }}
             30% {{ transform: scale(1.2); }}
             40% {{ transform: scale(1); }}
-        }}
-        .last-update {{
-            font-size: 0.7em;
-            opacity: 0.6;
-            text-align: center;
-            margin-top: 8px;
         }}
         .stale {{
             opacity: 0.3;
@@ -204,10 +208,11 @@ def create_app(gate_controller, mqtt_enabled=False):
     <div class="card">
         <div class="header">
             <div class="version">FAAC Monitor{title_suffix}</div>
-            <div id="state">
-                <span class="status-heart">❤</span>LOADING...
+            <div id="state">LOADING...</div>
+            <div class="last-update" id="lastUpdate">
+                <span class="status-heart">❤</span>
+                <span id="lastUpdateText">Connecting...</span>
             </div>
-            <div class="last-update" id="lastUpdate">Connecting...</div>
         </div>
 
         <div class="wing">
@@ -268,7 +273,7 @@ def create_app(gate_controller, mqtt_enabled=False):
         source.onerror = function(e) {{
             sseConnected = false;
             console.error("SSE connection error", e);
-            document.getElementById("lastUpdate").textContent = "Connection lost - Reconnecting...";
+            document.getElementById("lastUpdateText").textContent = "Connection lost - Reconnecting...";
             document.getElementById("lastUpdate").classList.add("stale");
         }};
 
@@ -278,11 +283,10 @@ def create_app(gate_controller, mqtt_enabled=False):
             sseConnected = true;
 
             const stateEl = document.getElementById("state");
-            stateEl.innerHTML = '<span class="status-heart">❤</span>' + d.state;
+            stateEl.textContent = d.state;
 
             const color = stateColors[d.state] || "#757575";
             stateEl.style.color = color;
-            document.querySelector(".status-heart").style.color = color;
 
             document.getElementById("w1v").innerText = d.wing1;
             document.getElementById("w1b").style.width = d.wing1 + "%";
@@ -299,17 +303,18 @@ def create_app(gate_controller, mqtt_enabled=False):
             if (!sseConnected) return;
 
             const elapsed = Math.floor((Date.now() - lastUpdateTime) / 1000);
+            const lastUpdateText = document.getElementById("lastUpdateText");
             const lastUpdateEl = document.getElementById("lastUpdate");
 
             if (elapsed < 15) {{
-                lastUpdateEl.textContent = "Live";
+                lastUpdateText.textContent = "Live";
                 lastUpdateEl.classList.remove("stale");
             }} else if (elapsed < 60) {{
-                lastUpdateEl.textContent = "Last update: " + elapsed + "s ago";
+                lastUpdateText.textContent = "Last update: " + elapsed + "s ago";
                 lastUpdateEl.classList.add("stale");
             }} else {{
                 const minutes = Math.floor(elapsed / 60);
-                lastUpdateEl.textContent = "Last update: " + minutes + "m ago";
+                lastUpdateText.textContent = "Last update: " + minutes + "m ago";
                 lastUpdateEl.classList.add("stale");
             }}
         }}, 1000);
