@@ -54,6 +54,9 @@ class GateController:
         self.last_status_publish = 0
         self.heartbeat_interval = 5  # Publish status every 5 seconds even if unchanged
 
+        # Track last command for HomeKit-style stop (send same command to stop)
+        self.last_command = None
+
         # Command queue
         self.command_queue = queue.Queue()
 
@@ -100,12 +103,22 @@ class GateController:
         except (ValueError, TypeError):
             pass
 
+        # HomeKit-style stop: If gate is MOVING and same command sent again, treat as STOP
+        command_lower = command.lower()
+        if self.status['state'] == "MOVING" and command_lower == self.last_command:
+            logger.info(f"HomeKit-style stop: '{command_lower}' sent while already moving in that direction")
+            command_lower = "stop"
+
         # It's a regular command
-        if FaacProtocol.validate_command(command):
+        if FaacProtocol.validate_command(command_lower):
             # Cancel any active position control
             self.position_control_active = False
             self.target_position = None
-            self.command_queue.put(command.lower())
+            self.command_queue.put(command_lower)
+
+            # Track last command (but not 'stop' itself)
+            if command_lower != "stop":
+                self.last_command = command_lower
         else:
             logger.warning(f"Invalid command: {command}")
 
