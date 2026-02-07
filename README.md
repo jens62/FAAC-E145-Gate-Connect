@@ -51,6 +51,7 @@ See [MQTT documentation](docs/MQTT.md) for detailed integration guides.
 
 ## Documentation
 
+- **[FAAC Software Guide](docs/FAAC_SOFTWARE.md)** - Official FAAC software download, VirtualHere setup, deployment options
 - **[USB Setup Guide](USB_SETUP.md)** - USB driver configuration for FAAC E145 controller
 - **[Installation Guide](scripts/README.md)** - Systemd service setup and log management
 - **[MQTT Setup](MQTT_SETUP.md)** - MQTT broker configuration
