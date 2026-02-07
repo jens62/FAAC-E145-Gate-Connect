@@ -6,6 +6,7 @@ Complete OpenHAB configuration for controlling the FAAC E145 gate via MQTT with 
 
 - ✅ **Direct position control (0-100%)** - NO RULES NEEDED!
 - ✅ **HomeKit/Siri integration** for voice control in German
+- ✅ **HomeKit-style stop** - Say "Open" while opening to stop (like professional blinds)
 - ✅ **Real-time position feedback** from both wings
 - ✅ **Alexa & Google Assistant** support included
 - ✅ **Simple configuration** - just things, items, and sitemap
@@ -111,6 +112,12 @@ sudo systemctl restart openhab
 - **"Hey Siri, fahre Hoftor runter"** - Closes (rollershutter style)
 - **"Hey Siri, wie weit ist Hoftor geöffnet?"** - Checks position
 
+**🎯 HomeKit-Style Stop** (Like Eve, Somfy, Shelly, Fibaro):
+- **Gate is opening** → Say **"Öffne Hoftor"** again → **Stops!** 🛑
+- **Gate is closing** → Say **"Schließe Hoftor"** again → **Stops!** 🛑
+- **In Home app:** Tap "Open" while opening → Stops
+- **In Home app:** Tap "Close" while closing → Stops
+
 **With GarageDoorOpener:**
 - Same commands work
 - **But:** Security confirmation prompt appears when opening
@@ -135,12 +142,33 @@ sudo systemctl restart openhab
 6. Gate stops at exactly 30%!
 ```
 
+### HomeKit-Style Stop 🎯
+
+Professional HomeKit blinds (Eve, Somfy, Shelly, Fibaro) don't have a separate "Stop" command in HomeKit. Instead, they stop by **repeating the same command**:
+
+```
+1. You say: "Öffne Hoftor" → Gate starts opening
+2. You say: "Öffne Hoftor" again → Gate stops!
+```
+
+**How it works:**
+- Gateway tracks the last command ("open" or "close")
+- When gate is MOVING and same command sent → Converts to STOP
+- Works across all interfaces: HomeKit, OpenHAB, MQTT, Web GUI
+
+**Examples:**
+- Gate opening → "Open" again → STOPS ✅
+- Gate closing → "Close" again → STOPS ✅
+- Gate stopped at 50% → "Open" → Resumes opening ✅
+- Gate moving → Opposite command → Changes direction ✅
+
 ### Why No Rules Needed?
 
-The FAAC gateway firmware now includes intelligent position control:
+The FAAC gateway firmware now includes intelligent control:
 - Accepts position commands (0-100)
 - Monitors current position continuously
 - Automatically sends STOP when target reached
+- HomeKit-style stop by repeating commands
 - Works just like any other OpenHAB rollershutter!
 
 This is much simpler than the old approach with complex rules.
@@ -175,6 +203,13 @@ Just say any of the commands listed above!
 | `faac/gate/wing2` | ← Gate | "42" | Current Wing 2 position (0-100%) |
 | `faac/gate/state` | ← Gate | "MOVING" | State: OPEN/CLOSED/MOVING/STOPPED |
 | `faac/gate/availability` | ← Gate | "online" | Connection status |
+| `faac/gate/server_heartbeat` | ← Gate | "2026-02-06T20:45:30" | Server alive timestamp (ISO 8601) |
+| `faac/gate/gate_last_seen` | ← Gate | "2026-02-06T20:45:29" | Gate (USB) last response timestamp |
+
+**Heartbeat monitoring** (updates every 5 seconds):
+- Compare `server_heartbeat` vs `gate_last_seen` to diagnose connection issues
+- If both frozen → OpenHAB ↔ MQTT connection broken
+- If only gate frozen → Server alive, but USB/gate connection broken
 
 ## ✨ Advantages Over Rules-Based Approach
 
@@ -287,8 +322,9 @@ This OpenHAB integration provides:
 - Native position control (0-100%)
 - No complex rules needed
 - Works like any other rollershutter
-- Full HomeKit/Siri support
-- Real-time position feedback
+- Full HomeKit/Siri support with professional-grade stop behavior
+- HomeKit-style stop: repeat command to stop (like Eve, Somfy, Shelly, Fibaro)
+- Real-time position feedback with dual heartbeat monitoring
 - Clean, simple configuration
 
 Just copy 3 files, configure MQTT broker, and you're done! 🎉
