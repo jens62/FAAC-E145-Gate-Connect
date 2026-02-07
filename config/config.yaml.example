@@ -24,6 +24,14 @@ mqtt:
 # - faac/gate/availability - Online/offline status
 # - faac/gate/command - Command input (publish: open/close/stop)
 
+# Logging configuration
+logging:
+  # Log file path (null to disable file logging, keeps systemd journal)
+  file: null  # e.g., /var/log/faac-gateway/faac-gateway.log
+  level: INFO  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  max_bytes: 10485760  # 10MB per log file
+  backup_count: 5  # Keep 5 rotated log files
+
 # Web interface configuration
 web:
   enabled: true

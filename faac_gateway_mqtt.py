@@ -17,17 +17,59 @@ from faac_gateway.web import create_app
 from faac_gateway.integrations.mqtt import MQTTClient
 from faac_gateway.config import load_config
 
-# Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
-    datefmt='%H:%M:%S'
-)
-
-# Minimize Flask logs
-logging.getLogger('werkzeug').setLevel(logging.ERROR)
-
+# Setup logging (configured after loading config)
 logger = logging.getLogger(__name__)
+
+
+def setup_logging(config):
+    """Configure logging based on config file"""
+    from logging.handlers import RotatingFileHandler
+
+    handlers = []
+
+    # Console handler (for systemd journal)
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter(
+        '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        datefmt='%H:%M:%S'
+    ))
+    handlers.append(console_handler)
+
+    # File handler (optional)
+    log_config = config.get('logging', {})
+    log_file = log_config.get('file')
+    if log_file:
+        try:
+            # Create log directory if needed
+            import os
+            log_dir = os.path.dirname(log_file)
+            if log_dir and not os.path.exists(log_dir):
+                os.makedirs(log_dir, mode=0o755)
+
+            file_handler = RotatingFileHandler(
+                log_file,
+                maxBytes=log_config.get('max_bytes', 10485760),  # 10MB default
+                backupCount=log_config.get('backup_count', 5)
+            )
+            file_handler.setFormatter(logging.Formatter(
+                '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+                datefmt='%Y-%m-%d %H:%M:%S'
+            ))
+            handlers.append(file_handler)
+            logger.info(f"File logging enabled: {log_file}")
+        except Exception as e:
+            logger.error(f"Failed to setup file logging: {e}")
+
+    # Configure root logger
+    log_level = getattr(logging, log_config.get('level', 'INFO').upper())
+    logging.basicConfig(
+        level=log_level,
+        format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        handlers=handlers
+    )
+
+    # Minimize Flask logs
+    logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
 
 def main():
@@ -49,11 +91,14 @@ def main():
     args = parser.parse_args()
 
     # Load configuration
-    config = load_config(args.config)
+    config_dict = load_config(args.config)
 
-    # Apply logging level
-    log_level = getattr(logging, config.log_level.upper())
-    logging.getLogger().setLevel(log_level)
+    # Setup logging (console + optional file)
+    setup_logging(config_dict)
+
+    # Convert to object for backward compatibility
+    from types import SimpleNamespace
+    config = SimpleNamespace(**config_dict)
 
     # Override with command line arguments
     show_tx = args.tx or config.show_tx

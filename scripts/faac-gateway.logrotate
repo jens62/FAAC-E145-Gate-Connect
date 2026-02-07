@@ -1,0 +1,34 @@
+# Logrotate configuration for FAAC Gateway
+# Install to: /etc/logrotate.d/faac-gateway
+#
+# Note: This is only needed if you enable file logging in config.yaml
+# If using only systemd journal, this file is not needed.
+
+/var/log/faac-gateway/*.log {
+    # Rotate daily
+    daily
+
+    # Keep 14 days of logs
+    rotate 14
+
+    # Don't error if log file is missing
+    missingok
+
+    # Don't rotate if log file is empty
+    notifempty
+
+    # Compress old log files
+    compress
+
+    # Delay compression until next rotation
+    delaycompress
+
+    # Create new log file with these permissions
+    create 0640 root root
+
+    # Run after rotation
+    postrotate
+        # Signal systemd service to reopen log files
+        /bin/systemctl reload faac-gateway.service > /dev/null 2>&1 || true
+    endscript
+}
