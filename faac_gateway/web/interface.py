@@ -217,7 +217,7 @@ def create_app(gate_controller, mqtt_enabled=False):
 
         <div class="wing">
             <div class="wing-label">
-                <span>Wing 1 (Master)</span>
+                <span>Wing 1</span>
                 <span class="wing-value"><span id="w1v">0</span>%</span>
             </div>
             <div class="bar-bg">
@@ -227,7 +227,7 @@ def create_app(gate_controller, mqtt_enabled=False):
 
         <div class="wing">
             <div class="wing-label">
-                <span>Wing 2 (Slave)</span>
+                <span>Wing 2</span>
                 <span class="wing-value"><span id="w2v">0</span>%</span>
             </div>
             <div class="bar-bg">

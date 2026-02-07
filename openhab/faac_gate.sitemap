@@ -12,10 +12,10 @@ sitemap faac_gate label="Hoftor Steuerung" {
 
     Frame label="Detaillierte Ansicht" {
         // Individual wing positions
-        Text item=Hoftor_Wing1 label="Flügel 1 (Master) [%d %%]" icon="chart"
+        Text item=Hoftor_Wing1 label="Flügel 1 [%d %%]" icon="chart"
         Slider item=Hoftor_Wing1 label="Flügel 1" minValue=0 maxValue=100 step=1 visibility=[Hoftor_State!="CLOSED"]
 
-        Text item=Hoftor_Wing2 label="Flügel 2 (Slave) [%d %%]" icon="chart"
+        Text item=Hoftor_Wing2 label="Flügel 2 [%d %%]" icon="chart"
         Slider item=Hoftor_Wing2 label="Flügel 2" minValue=0 maxValue=100 step=1 visibility=[Hoftor_State!="CLOSED"]
 
         // Status with color coding
