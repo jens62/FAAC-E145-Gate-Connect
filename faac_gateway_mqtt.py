@@ -117,16 +117,23 @@ def main():
         logger.info(f"Web UI: http://{config.web_host}:{config.web_port}")
 
     print()
-    print("Commands: OPEN, CLOSE, STOP")
+    print("Commands: OPEN, CLOSE, STOP, 0-100 (position)")
 
     if config.mqtt_enabled:
         print()
         print("MQTT Topics:")
         print(f"  Publish commands to: {config.mqtt_base_topic}/command")
-        print(f"  Subscribe to status: {config.mqtt_base_topic}/status")
-        print(f"  Subscribe to state: {config.mqtt_base_topic}/state")
-        print(f"  Subscribe to wing1: {config.mqtt_base_topic}/wing1")
-        print(f"  Subscribe to wing2: {config.mqtt_base_topic}/wing2")
+        print(f"    - Text commands: open, close, stop")
+        print(f"    - Position: 0-100 (0=fully closed, 100=fully open)")
+        print()
+        print(f"  Subscribe to status:")
+        print(f"    - {config.mqtt_base_topic}/status (JSON with all fields)")
+        print(f"    - {config.mqtt_base_topic}/state (OPEN, CLOSED, MOVING, STOPPED, UNKNOWN)")
+        print(f"    - {config.mqtt_base_topic}/wing1 (0-100%)")
+        print(f"    - {config.mqtt_base_topic}/wing2 (0-100%)")
+        print(f"    - {config.mqtt_base_topic}/availability (online/offline)")
+        print(f"    - {config.mqtt_base_topic}/server_heartbeat (ISO 8601 timestamp)")
+        print(f"    - {config.mqtt_base_topic}/gate_last_seen (ISO 8601 timestamp)")
 
     print("=" * 80)
     print()
