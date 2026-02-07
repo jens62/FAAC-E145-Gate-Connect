@@ -8,7 +8,11 @@
     "emojis": false,
     "over_engineering": false,
     "explicit_requests_only": true,
-    "comments": "minimal"
+    "comments": "minimal",
+    "dry_principle": true,
+    "well_structured": true,
+    "architecture_focus": true,
+    "language": "english"
   },
 
   "project_rules": {
@@ -32,6 +36,14 @@
       "extensive - Document everything",
       "docstrings_only - Only function/class docstrings"
     ],
+
+    "code_quality_options": {
+      "_comment": "Active preferences (currently set above)",
+      "dry_principle": "true - No code duplication, follow DRY (Don't Repeat Yourself)",
+      "well_structured": "true - Maintain clear code organization and structure",
+      "architecture_focus": "true - Keep an eye on overall architecture and design patterns",
+      "language": "english - All code, comments, variables, functions in English"
+    },
 
     "testing_options": {
       "_comment": "Uncomment and add to preferences section when needed",
