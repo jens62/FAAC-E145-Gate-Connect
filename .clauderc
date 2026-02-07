@@ -1,0 +1,48 @@
+{
+  "_comment": "Claude Code project configuration - JSON doesn't support comments, so options are documented below",
+
+  "commit_convention": "conventional",
+  "code_style": "simple",
+
+  "preferences": {
+    "emojis": false,
+    "over_engineering": false,
+    "explicit_requests_only": true,
+    "comments": "minimal"
+  },
+
+  "project_rules": {
+    "openhab_rules": false,
+    "server_side_logic": true
+  },
+
+  "_available_options": {
+    "_info": "Copy/paste options from here into the active sections above when needed",
+
+    "code_style_options": [
+      "simple - Avoid over-engineering, minimal abstractions, straightforward solutions",
+      "verbose - More comments, detailed documentation, explicit variable names",
+      "minimal - Terse, concise code with fewer comments",
+      "functional - Prefer functional programming patterns",
+      "object_oriented - Prefer OOP patterns with classes"
+    ],
+
+    "comments_options": [
+      "minimal - Only for complex/non-obvious code (current)",
+      "extensive - Document everything",
+      "docstrings_only - Only function/class docstrings"
+    ],
+
+    "testing_options": {
+      "_comment": "Uncomment and add to preferences section when needed",
+      "testing": "on_request",
+      "_values": ["always", "on_request", "critical_paths"]
+    },
+
+    "error_handling_options": {
+      "_comment": "Uncomment and add to preferences section when needed",
+      "error_handling": "pragmatic",
+      "_values": ["defensive", "pragmatic", "minimal"]
+    }
+  }
+}
