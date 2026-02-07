@@ -91,14 +91,12 @@ def main():
     args = parser.parse_args()
 
     # Load configuration
-    config_dict = load_config(args.config)
+    config = load_config(args.config)
 
     # Setup logging (console + optional file)
-    setup_logging(config_dict)
+    setup_logging(config._data)
 
-    # Convert to object for backward compatibility
-    from types import SimpleNamespace
-    config = SimpleNamespace(**config_dict)
+    # Keep using the Config object (has properties for all settings)
 
     # Override with command line arguments
     show_tx = args.tx or config.show_tx
