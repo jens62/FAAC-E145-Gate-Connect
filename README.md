@@ -11,7 +11,8 @@ Open-source Python gateway for FAAC E145 gate controllers with MQTT, OpenHAB, an
 - Real-time position monitoring (0-100% for both wings)
 - Web interface with live updates
 - **MQTT integration** for home automation
-- Commands: Open, Close, Stop
+- **REST API** for HTTP-based control and monitoring
+- Commands: Open, Close, Stop, Position (0-100%)
 - Status publishing: position, state, availability
 - Home Assistant & OpenHAB compatible
 
@@ -49,8 +50,28 @@ Publish commands:
 
 See [MQTT documentation](docs/MQTT.md) for detailed integration guides.
 
+## REST API
+
+Simple HTTP endpoints for gate control:
+
+```bash
+# Get status
+curl http://localhost:5000/api/status
+
+# Send command
+curl -X POST http://localhost:5000/api/command \
+     -H "Content-Type: application/json" \
+     -d '{"command": "open"}'
+
+# Health check
+curl http://localhost:5000/api/health
+```
+
+See [REST API documentation](docs/REST_API.md) for complete API reference, authentication, and examples.
+
 ## Documentation
 
+- **[REST API Guide](docs/REST_API.md)** - RESTful HTTP API for gate control and status
 - **[FAAC Software Guide](docs/FAAC_SOFTWARE.md)** - Official FAAC software download, VirtualHere setup, deployment options
 - **[USB Setup Guide](USB_SETUP.md)** - USB driver configuration for FAAC E145 controller
 - **[Installation Guide](scripts/README.md)** - Systemd service setup and log management

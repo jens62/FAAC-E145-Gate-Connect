@@ -38,6 +38,14 @@ web:
   host: 0.0.0.0  # Listen on all interfaces
   port: 5000     # Web interface port
 
+# REST API configuration
+api:
+  enabled: true  # Enable REST API endpoints
+  key: null      # API key for authentication (null = no authentication)
+                 # Example: "your-secret-api-key-here"
+  cors_enabled: false  # Enable CORS headers (for web apps from other domains)
+  cors_origins: "*"    # Allowed origins (* = all, or specific domain like "https://example.com")
+
 # Logging configuration
 logging:
   level: INFO  # DEBUG, INFO, WARNING, ERROR

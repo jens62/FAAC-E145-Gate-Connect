@@ -107,44 +107,23 @@ class MQTTClient:
             logger.info("Disconnected from MQTT broker")
 
     def _on_message(self, client, userdata, msg):
-        """Callback when message is received"""
+        """
+        Callback when message is received
+
+        Command validation and processing is handled by GateController.normalize_command()
+        This ensures all interfaces (MQTT, REST, Web) use the same validation logic.
+        """
         try:
             if msg.topic == self.command_topic:
                 command = msg.payload.decode('utf-8').strip()
-                logger.info(f"Received command: {command}")
+                logger.info(f"Received MQTT command: {command}")
 
-                # Try to parse as position (0-100)
-                try:
-                    position = int(command)
-                    if 0 <= position <= 100:
-                        # Map extreme positions to text commands for limit switch accuracy
-                        # This ensures HomeKit/voice "Open" and "Close" commands
-                        # run the gate to limit switches instead of stopping at ~99% or ~1%
-                        if position == 0:
-                            command = "close"
-                            logger.info(f"Position 0 mapped to 'close' command")
-                        elif position == 100:
-                            command = "open"
-                            logger.info(f"Position 100 mapped to 'open' command")
-                        else:
-                            # Partial position (1-99%) - use position control
-                            if self.command_callback:
-                                self.command_callback(str(position))
-                            else:
-                                logger.warning("No command callback registered")
-                            return
-                except (ValueError, TypeError):
-                    pass
-
-                # Handle text commands (including mapped positions)
-                command_lower = command.lower()
-                if command_lower in ['open', 'close', 'stop']:
-                    if self.command_callback:
-                        self.command_callback(command_lower)
-                    else:
-                        logger.warning("No command callback registered")
+                if self.command_callback:
+                    # Send directly to controller - it handles all validation and mapping
+                    self.command_callback(command)
                 else:
-                    logger.warning(f"Invalid command received: {command}")
+                    logger.warning("No command callback registered")
+
         except Exception as e:
             logger.error(f"Error processing MQTT message: {e}")
 

@@ -5,21 +5,35 @@ Flask web interface for FAAC gate control
 import json
 import threading
 from flask import Flask, Response
+from .api import api_bp
 
 
-def create_app(gate_controller, mqtt_enabled=False):
+def create_app(gate_controller, mqtt_enabled=False, config=None):
     """
     Create Flask application
 
     Args:
         gate_controller: GateController instance
         mqtt_enabled: Whether MQTT is enabled (for display purposes)
+        config: Configuration dict (optional, for API settings)
 
     Returns:
         Flask app instance
     """
     app = Flask(__name__)
     status_changed = threading.Event()
+
+    # Store controller and config in app context for API access
+    app.config['GATE_CONTROLLER'] = gate_controller
+    app.config['GATE_CONFIG'] = config or {}
+
+    # Register REST API blueprint
+    api_enabled = True
+    if config:
+        api_enabled = config.get('api', {}).get('enabled', True)
+
+    if api_enabled:
+        app.register_blueprint(api_bp)
 
     # Set up status callback to notify web clients
     original_callback = gate_controller.status_callback

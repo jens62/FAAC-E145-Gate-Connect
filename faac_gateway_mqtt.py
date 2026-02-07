@@ -194,7 +194,7 @@ def main():
 
     # Create Flask app if enabled
     if config.web_enabled:
-        app = create_app(controller, mqtt_enabled=config.mqtt_enabled)
+        app = create_app(controller, mqtt_enabled=config.mqtt_enabled, config=config._data)
 
         try:
             app.run(

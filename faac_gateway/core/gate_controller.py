@@ -87,6 +87,85 @@ class GateController:
             self._thread.join(timeout=5)
         logger.info("Gate controller stopped")
 
+    def normalize_command(self, command: str) -> dict:
+        """
+        Normalize and validate command input from any interface (MQTT, REST, Web)
+
+        This is the SINGLE place where command validation and preprocessing happens.
+        All interfaces (MQTT, REST API, Web GUI) should use this method.
+
+        Args:
+            command: Command string (open/close/stop or 0-100)
+
+        Returns:
+            dict with:
+                - 'valid': bool - whether command is valid
+                - 'type': str - 'text' or 'position'
+                - 'command': str - normalized command to execute
+                - 'original': str - original command received
+                - 'error': str - error message if invalid
+
+        Examples:
+            normalize_command("open") -> {'valid': True, 'type': 'text', 'command': 'open', ...}
+            normalize_command("100") -> {'valid': True, 'type': 'text', 'command': 'open', ...}
+            normalize_command("0") -> {'valid': True, 'type': 'text', 'command': 'close', ...}
+            normalize_command("50") -> {'valid': True, 'type': 'position', 'command': '50', ...}
+            normalize_command("invalid") -> {'valid': False, 'error': '...', ...}
+        """
+        result = {
+            'valid': False,
+            'type': None,
+            'command': None,
+            'original': command,
+            'error': None
+        }
+
+        # Try to parse as position (0-100)
+        try:
+            position = int(command)
+            if not (0 <= position <= 100):
+                result['error'] = f"Position must be between 0 and 100, got {position}"
+                return result
+
+            # Map extreme positions to text commands for limit switch accuracy
+            # This ensures HomeKit/voice "Open" and "Close" commands run the gate
+            # to limit switches instead of stopping at ~99% or ~1%
+            if position == 0:
+                result['valid'] = True
+                result['type'] = 'text'
+                result['command'] = 'close'
+                logger.info(f"Position 0 mapped to 'close' command")
+                return result
+            elif position == 100:
+                result['valid'] = True
+                result['type'] = 'text'
+                result['command'] = 'open'
+                logger.info(f"Position 100 mapped to 'open' command")
+                return result
+            else:
+                # Partial position (1-99%) - use position control
+                result['valid'] = True
+                result['type'] = 'position'
+                result['command'] = str(position)
+                return result
+
+        except (ValueError, TypeError):
+            # Not a number, treat as text command
+            pass
+
+        # Handle text commands
+        command_lower = str(command).lower().strip()
+
+        if command_lower in ['open', 'close', 'stop']:
+            result['valid'] = True
+            result['type'] = 'text'
+            result['command'] = command_lower
+            return result
+
+        # Invalid command
+        result['error'] = f"Invalid command '{command}'. Use 'open', 'close', 'stop', or position 0-100"
+        return result
+
     def send_command(self, command: str):
         """
         Queue a command to be sent to the gate
@@ -94,22 +173,28 @@ class GateController:
         Args:
             command: Command to send (open, close, stop) or position (0-100)
         """
-        # Check if it's a position command (numeric 0-100)
-        try:
-            position = int(command)
-            if 0 <= position <= 100:
-                self.send_position(position)
-                return
-        except (ValueError, TypeError):
-            pass
+        # Normalize command (validates and applies position mapping)
+        normalized = self.normalize_command(command)
+
+        if not normalized['valid']:
+            logger.warning(f"Invalid command: {normalized['error']}")
+            return
+
+        # Handle position commands
+        if normalized['type'] == 'position':
+            position = int(normalized['command'])
+            self.send_position(position)
+            return
+
+        # Handle text commands
+        command_lower = normalized['command']
 
         # HomeKit-style stop: If gate is MOVING and same command sent again, treat as STOP
-        command_lower = command.lower()
         if self.status['state'] == "MOVING" and command_lower == self.last_command:
             logger.info(f"HomeKit-style stop: '{command_lower}' sent while already moving in that direction")
             command_lower = "stop"
 
-        # It's a regular command
+        # Send command
         if FaacProtocol.validate_command(command_lower):
             # Cancel any active position control
             self.position_control_active = False
