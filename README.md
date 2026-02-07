@@ -51,6 +51,10 @@ See [MQTT documentation](docs/MQTT.md) for detailed integration guides.
 
 ## Documentation
 
+- **[USB Setup Guide](USB_SETUP.md)** - USB driver configuration for FAAC E145 controller
+- **[Installation Guide](scripts/README.md)** - Systemd service setup and log management
+- **[MQTT Setup](MQTT_SETUP.md)** - MQTT broker configuration
+- **[OpenHAB Integration](openhab/README.md)** - OpenHAB configuration and usage
 - [MQTT Integration Guide](docs/MQTT.md) - Home Assistant, OpenHAB, Node-RED
 - [Full Documentation](docs/)
 
