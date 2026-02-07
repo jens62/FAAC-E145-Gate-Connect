@@ -102,6 +102,7 @@ class MQTTClient:
         self.connected = False
         if rc != 0:
             logger.warning(f"Unexpected disconnection from MQTT broker (rc: {rc})")
+            logger.info("Will automatically reconnect (paho-mqtt handles this)")
         else:
             logger.info("Disconnected from MQTT broker")
 
@@ -148,14 +149,23 @@ class MQTTClient:
             logger.error(f"Error processing MQTT message: {e}")
 
     def connect(self):
-        """Connect to MQTT broker"""
+        """
+        Connect to MQTT broker with automatic reconnection
+
+        Note: If initial connection fails, loop_start() will keep trying to
+        reconnect indefinitely in the background. This handles scenarios where
+        the MQTT broker is down at startup or goes down during operation.
+        """
         try:
             logger.info(f"Connecting to MQTT broker at {self.broker}:{self.port}")
             self.client.connect(self.broker, self.port, keepalive=60)
             self.client.loop_start()
+            logger.info("MQTT client started (will auto-reconnect if connection lost)")
         except Exception as e:
-            logger.error(f"Failed to connect to MQTT broker: {e}")
-            raise
+            logger.warning(f"Initial MQTT connection failed: {e}")
+            logger.info("Starting MQTT loop anyway - will keep trying to reconnect...")
+            self.client.loop_start()
+            # Don't raise - let loop_start() handle reconnection attempts
 
     def disconnect(self):
         """Disconnect from MQTT broker"""

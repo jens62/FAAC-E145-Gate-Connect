@@ -1,7 +1,7 @@
 [Unit]
 Description=FAAC E145 Gate Connect with MQTT
-After=network.target mosquitto.service
-Wants=mosquitto.service
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=simple
