@@ -114,6 +114,28 @@ def create_app(gate_controller, mqtt_enabled=False, config=None):
             letter-spacing: 2px;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
         }}
+        .gate-viewport {{
+            width: 100%;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, #d4e6f1 0%, #e8f4f8 50%, #d0d8dc 100%);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+            padding: 20px 10px;
+            overflow: hidden;
+        }}
+        .gate-wrapper {{
+            width: 100%;
+            max-width: 100%;
+        }}
+        .gate-wrapper svg {{
+            display: block;
+            width: 100%;
+            height: auto;
+        }}
         .wing {{
             margin: 15px 0;
         }}
@@ -229,6 +251,79 @@ def create_app(gate_controller, mqtt_enabled=False, config=None):
             </div>
         </div>
 
+        <div class="gate-viewport">
+            <div class="gate-wrapper">
+                <svg id="gate-svg" viewBox="-7.5 -7.5 3480 1330" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <symbol id="hinge" width="32" height="105">
+                            <rect width="32" height="105" fill="#555" />
+                            <line x1="0" y1="35" x2="32" y2="35" stroke="#888" stroke-width="1" />
+                            <line x1="0" y1="70" x2="32" y2="70" stroke="#888" stroke-width="1" />
+                        </symbol>
+
+                        <symbol id="post">
+                            <line x1="50" y1="0" x2="50" y2="1330" stroke="#555" stroke-width="100" />
+                        </symbol>
+                    </defs>
+
+                    <!-- Left side -->
+                    <use href="#post" x="0" y="-7.5" />
+                    <use href="#hinge" x="105.25" y="10" />
+                    <use href="#hinge" x="105.25" y="1100" />
+
+                    <!-- Left wing -->
+                    <g id="wing1-group">
+                        <line id="wing1-frame-top" y1="7.5" y2="7.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-frame-bottom" y1="1207.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-frame-left" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-frame-right" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-reinf-1" y1="242.5" y2="242.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-reinf-2" y1="1092.5" y2="1092.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-bar-1" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-bar-2" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-bar-3" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-bar-4" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-bar-5" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-bar-6" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-bar-7" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-bar-8" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-bar-9" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-bar-10" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-bar-11" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        <line id="wing1-bar-12" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                    </g>
+
+                    <!-- Right side (mirrored) -->
+                    <g transform="translate(3480, 0) scale(-1, 1)">
+                        <use href="#post" x="0" y="-7.5" />
+                        <use href="#hinge" x="105.25" y="10" />
+                        <use href="#hinge" x="105.25" y="1100" />
+
+                        <g id="wing2-group">
+                            <line id="wing2-frame-top" y1="7.5" y2="7.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-frame-bottom" y1="1207.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-frame-left" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-frame-right" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-reinf-1" y1="242.5" y2="242.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-reinf-2" y1="1092.5" y2="1092.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-bar-1" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-bar-2" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-bar-3" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-bar-4" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-bar-5" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-bar-6" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-bar-7" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-bar-8" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-bar-9" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-bar-10" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-bar-11" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing2-bar-12" y1="7.5" y2="1207.5" stroke="#555" stroke-width="15" />
+                        </g>
+                    </g>
+                </svg>
+            </div>
+        </div>
+
         <div class="wing">
             <div class="wing-label">
                 <span>Wing 1</span>
@@ -279,6 +374,63 @@ def create_app(gate_controller, mqtt_enabled=False, config=None):
         let lastUpdateTime = Date.now();
         let sseConnected = false;
 
+        // Gate animation geometry
+        const ROTATION_X = 125;
+        const FRAME_LEFT_CLOSED = 150;
+        const FRAME_RIGHT_CLOSED = 1725;
+        const FRAME_LEFT_DX = FRAME_LEFT_CLOSED - ROTATION_X;
+        const FRAME_RIGHT_DX = FRAME_RIGHT_CLOSED - ROTATION_X;
+        const FRAME_STROKE_CLOSED = 15;
+        const FRAME_STROKE_OPEN = 40;
+        const barAbsolute = [271.15, 392.31, 513.46, 634.62, 755.77, 876.92,
+                             998.08, 1119.23, 1240.38, 1361.54, 1482.69, 1603.85];
+        const barDX = barAbsolute.map(x => x - ROTATION_X);
+
+        function updateGateVisual(wingId, position) {{
+            const angle = (position / 100) * (Math.PI / 2);
+            const cosA = Math.cos(angle);
+            const sinA = Math.sin(angle);
+
+            const frameLeftX = ROTATION_X + FRAME_LEFT_DX * cosA;
+            const frameRightX = ROTATION_X + FRAME_RIGHT_DX * cosA;
+            const vertStroke = FRAME_STROKE_CLOSED * cosA + FRAME_STROKE_OPEN * sinA;
+            const halfVS = vertStroke / 2;
+
+            const fl = document.getElementById(`${{wingId}}-frame-left`);
+            fl.setAttribute('x1', frameLeftX);
+            fl.setAttribute('x2', frameLeftX);
+            fl.setAttribute('stroke-width', vertStroke);
+
+            const fr = document.getElementById(`${{wingId}}-frame-right`);
+            fr.setAttribute('x1', frameRightX);
+            fr.setAttribute('x2', frameRightX);
+            fr.setAttribute('stroke-width', vertStroke);
+
+            const hLeft = frameLeftX - halfVS;
+            const hRight = frameRightX + halfVS;
+
+            document.getElementById(`${{wingId}}-frame-top`).setAttribute('x1', hLeft);
+            document.getElementById(`${{wingId}}-frame-top`).setAttribute('x2', hRight);
+            document.getElementById(`${{wingId}}-frame-bottom`).setAttribute('x1', hLeft);
+            document.getElementById(`${{wingId}}-frame-bottom`).setAttribute('x2', hRight);
+
+            document.getElementById(`${{wingId}}-reinf-1`).setAttribute('x1', frameLeftX);
+            document.getElementById(`${{wingId}}-reinf-1`).setAttribute('x2', frameRightX);
+            document.getElementById(`${{wingId}}-reinf-2`).setAttribute('x1', frameLeftX);
+            document.getElementById(`${{wingId}}-reinf-2`).setAttribute('x2', frameRightX);
+
+            for (let i = 0; i < 12; i++) {{
+                const barX = ROTATION_X + barDX[i] * cosA;
+                const bar = document.getElementById(`${{wingId}}-bar-${{i + 1}}`);
+                bar.setAttribute('x1', barX);
+                bar.setAttribute('x2', barX);
+            }}
+        }}
+
+        // Initialize gate at closed position
+        updateGateVisual('wing1', 0);
+        updateGateVisual('wing2', 0);
+
         source.onopen = function() {{
             sseConnected = true;
             console.log("SSE connection established");
@@ -309,6 +461,10 @@ def create_app(gate_controller, mqtt_enabled=False, config=None):
             document.getElementById("w2v").innerText = d.wing2;
             document.getElementById("w2b").style.width = d.wing2 + "%";
             document.getElementById("w2b").style.backgroundColor = color;
+
+            // Update gate animation
+            updateGateVisual('wing1', d.wing1);
+            updateGateVisual('wing2', d.wing2);
         }};
 
         // Update "last seen" timestamp every second
