@@ -1,0 +1,225 @@
+# Example Automations for FAAC Gate
+# Add these to your automations.yaml or create via Home Assistant UI
+
+# Automation 1: Close gate at sunset
+- id: faac_gate_close_at_sunset
+  alias: "Close FAAC Gate at Sunset"
+  description: "Automatically close the gate 30 minutes after sunset"
+  trigger:
+    - platform: sun
+      event: sunset
+      offset: "+00:30:00"
+  condition:
+    - condition: state
+      entity_id: cover.faac_gate
+      state: "open"
+  action:
+    - service: cover.close_cover
+      target:
+        entity_id: cover.faac_gate
+    - service: notify.notify
+      data:
+        title: "Gate Closed"
+        message: "FAAC gate automatically closed at sunset"
+
+---
+
+# Automation 2: Open gate when arriving home
+- id: faac_gate_open_on_arrival
+  alias: "Open FAAC Gate on Arrival"
+  description: "Open gate when family member arrives home"
+  trigger:
+    - platform: zone
+      entity_id:
+        - person.family_member_1
+        - person.family_member_2
+      zone: zone.home
+      event: enter
+  condition:
+    - condition: state
+      entity_id: cover.faac_gate
+      state: "closed"
+    # Only between 6 AM and 11 PM
+    - condition: time
+      after: "06:00:00"
+      before: "23:00:00"
+  action:
+    - service: cover.open_cover
+      target:
+        entity_id: cover.faac_gate
+    - service: notify.notify
+      data:
+        title: "Gate Opening"
+        message: "Opening gate for {{ trigger.to_state.attributes.friendly_name }}"
+
+---
+
+# Automation 3: Alert if gate left open
+- id: faac_gate_open_alert
+  alias: "Alert if FAAC Gate Left Open"
+  description: "Send notification if gate is left open for more than 10 minutes"
+  trigger:
+    - platform: state
+      entity_id: cover.faac_gate
+      to: "open"
+      for:
+        minutes: 10
+  condition:
+    # Only alert during evening/night
+    - condition: time
+      after: "19:00:00"
+      before: "07:00:00"
+  action:
+    - service: notify.notify
+      data:
+        title: "Gate Alert"
+        message: "FAAC gate has been open for 10 minutes"
+        data:
+          actions:
+            - action: "CLOSE_GATE"
+              title: "Close Gate"
+
+---
+
+# Automation 4: Close gate after alert action
+- id: faac_gate_close_from_notification
+  alias: "Close FAAC Gate from Notification"
+  description: "Close gate when tapping notification action"
+  trigger:
+    - platform: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: "CLOSE_GATE"
+  action:
+    - service: cover.close_cover
+      target:
+        entity_id: cover.faac_gate
+
+---
+
+# Automation 5: Auto-close if opened but no one home
+- id: faac_gate_auto_close_away
+  alias: "Auto-close FAAC Gate When Away"
+  description: "Close gate if it opens while no one is home"
+  trigger:
+    - platform: state
+      entity_id: cover.faac_gate
+      to: "open"
+      for:
+        minutes: 2
+  condition:
+    - condition: state
+      entity_id: zone.home
+      state: "0"  # No one home
+  action:
+    - service: cover.close_cover
+      target:
+        entity_id: cover.faac_gate
+    - service: notify.notify
+      data:
+        title: "Gate Alert"
+        message: "Gate opened while away - automatically closing"
+
+---
+
+# Automation 6: Status update notification
+- id: faac_gate_status_change
+  alias: "FAAC Gate Status Change Notification"
+  description: "Send notification when gate state changes"
+  trigger:
+    - platform: state
+      entity_id: sensor.faac_gate_state
+      to:
+        - "OPEN"
+        - "CLOSED"
+  action:
+    - service: notify.notify
+      data:
+        title: "Gate {{ trigger.to_state.state | title }}"
+        message: "FAAC gate is now {{ trigger.to_state.state | lower }}"
+
+---
+
+# Automation 7: Gateway offline alert
+- id: faac_gateway_offline_alert
+  alias: "FAAC Gateway Offline Alert"
+  description: "Alert when FAAC gateway goes offline"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.faac_gateway_connection
+      to: "off"
+      for:
+        minutes: 2
+  action:
+    - service: notify.notify
+      data:
+        title: "Gateway Offline"
+        message: "FAAC gateway is offline - check Raspberry Pi connection"
+        data:
+          priority: high
+
+---
+
+# Automation 8: Close gate at specific time
+- id: faac_gate_close_at_time
+  alias: "Close FAAC Gate at 10 PM"
+  description: "Close gate every night at 10 PM"
+  trigger:
+    - platform: time
+      at: "22:00:00"
+  condition:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: cover.faac_gate
+          state: "closed"
+  action:
+    - service: cover.close_cover
+      target:
+        entity_id: cover.faac_gate
+
+---
+
+# Automation 9: Presence-based control
+- id: faac_gate_last_person_leaving
+  alias: "Close FAAC Gate When Last Person Leaves"
+  description: "Close gate when last person leaves home"
+  trigger:
+    - platform: state
+      entity_id: zone.home
+      to: "0"  # No one home
+  condition:
+    - condition: state
+      entity_id: cover.faac_gate
+      state: "open"
+  action:
+    - delay: "00:05:00"  # Wait 5 minutes
+    - condition: state
+      entity_id: zone.home
+      state: "0"  # Still no one home
+    - service: cover.close_cover
+      target:
+        entity_id: cover.faac_gate
+
+---
+
+# Automation 10: Position-based automation
+- id: faac_gate_partially_open_alert
+  alias: "Alert if FAAC Gate Stuck Partially Open"
+  description: "Alert if gate is stuck between 20-80% for more than 5 minutes"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.faac_gate_wing1
+      above: 20
+      below: 80
+      for:
+        minutes: 5
+  condition:
+    - condition: state
+      entity_id: sensor.faac_gate_state
+      state: "STOPPED"
+  action:
+    - service: notify.notify
+      data:
+        title: "Gate Alert"
+        message: "Gate appears stuck at {{ states('sensor.faac_gate_wing1') }}%"

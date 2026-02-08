@@ -1,0 +1,116 @@
+# Home Assistant Configuration for FAAC Gate
+# Add this to your Home Assistant configuration.yaml
+
+mqtt:
+  # MQTT Cover - Main gate control entity
+  cover:
+    - name: "FAAC Gate"
+      unique_id: faac_gate_cover
+      device_class: gate
+
+      # State topics
+      state_topic: "faac/gate/state"
+      position_topic: "faac/gate/wing1"
+      availability_topic: "faac/gate/availability"
+
+      # Command topic
+      command_topic: "faac/gate/command"
+      set_position_topic: "faac/gate/command"
+
+      # State value mappings
+      state_open: "OPEN"
+      state_opening: "OPENING"
+      state_closed: "CLOSED"
+      state_closing: "CLOSING"
+      state_stopped: "STOPPED"
+
+      # Command payloads
+      payload_open: "open"
+      payload_close: "close"
+      payload_stop: "stop"
+
+      # Availability
+      payload_available: "online"
+      payload_not_available: "offline"
+
+      # Position configuration
+      position_open: 100
+      position_closed: 0
+
+      # Position template - what Home Assistant SENDS to the gate
+      # Converts HA position slider (0-100) to gate command
+      # For 0 and 100, use close/open for limit switch accuracy
+      # For 1-99, send the number directly
+      position_template: >
+        {% if position is defined %}
+          {% if position == 0 %}
+            close
+          {% elif position == 100 %}
+            open
+          {% else %}
+            {{ position }}
+          {% endif %}
+        {% endif %}
+
+      # Don't assume state, wait for actual feedback
+      optimistic: false
+
+      # Retain state
+      retain: true
+
+  # Additional sensors for monitoring and diagnostics
+  sensor:
+    # Detailed state sensor
+    - name: "FAAC Gate State"
+      unique_id: faac_gate_state
+      state_topic: "faac/gate/state"
+      availability_topic: "faac/gate/availability"
+      payload_available: "online"
+      payload_not_available: "offline"
+      icon: mdi:gate-alert
+
+    # Wing 1 position sensor
+    - name: "FAAC Gate Wing 1"
+      unique_id: faac_gate_wing1
+      state_topic: "faac/gate/wing1"
+      availability_topic: "faac/gate/availability"
+      payload_available: "online"
+      payload_not_available: "offline"
+      unit_of_measurement: "%"
+      icon: mdi:gate-open
+      state_class: measurement
+
+    # Wing 2 position sensor
+    - name: "FAAC Gate Wing 2"
+      unique_id: faac_gate_wing2
+      state_topic: "faac/gate/wing2"
+      availability_topic: "faac/gate/availability"
+      payload_available: "online"
+      payload_not_available: "offline"
+      unit_of_measurement: "%"
+      icon: mdi:gate-open
+      state_class: measurement
+
+    # Server heartbeat - when gateway last published
+    # Note: device_class removed to avoid timezone errors
+    - name: "FAAC Gateway Heartbeat"
+      unique_id: faac_gateway_heartbeat
+      state_topic: "faac/gate/server_heartbeat"
+      icon: mdi:heart-pulse
+
+    # Gate last seen - when gate (USB) last responded
+    # Note: device_class removed to avoid timezone errors
+    - name: "FAAC Gate Last Seen"
+      unique_id: faac_gate_last_seen
+      state_topic: "faac/gate/gate_last_seen"
+      icon: mdi:clock-check-outline
+
+  # Binary sensor for gateway connection status
+  binary_sensor:
+    - name: "FAAC Gateway Connection"
+      unique_id: faac_gateway_connection
+      state_topic: "faac/gate/availability"
+      payload_on: "online"
+      payload_off: "offline"
+      device_class: connectivity
+      icon: mdi:connection
