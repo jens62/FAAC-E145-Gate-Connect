@@ -85,7 +85,24 @@ class FaacProtocol:
         else:
             still_count = 0
 
-        state = "STOPPED" if still_count >= FaacProtocol.STILLNESS_COUNT else "MOVING"
+        # Determine if stopped or moving (opening/closing)
+        if still_count >= FaacProtocol.STILLNESS_COUNT:
+            state = "STOPPED"
+        else:
+            # Determine direction based on position change
+            # Use average of both wings to determine overall direction
+            avg_current = (wing1 + wing2) / 2
+            avg_last = (last_wing1 + last_wing2) / 2
+
+            if avg_current > avg_last:
+                state = "OPENING"
+            elif avg_current < avg_last:
+                state = "CLOSING"
+            else:
+                # Positions same as last reading but haven't been still long enough
+                # This shouldn't happen often, default to generic moving
+                state = "OPENING" if wing1 > 50 else "CLOSING"
+
         return state, still_count
 
     @staticmethod

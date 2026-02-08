@@ -188,7 +188,7 @@ def main():
         print()
         print(f"  Subscribe to status:")
         print(f"    - {config.mqtt_base_topic}/status (JSON with all fields)")
-        print(f"    - {config.mqtt_base_topic}/state (OPEN, CLOSED, MOVING, STOPPED, UNKNOWN)")
+        print(f"    - {config.mqtt_base_topic}/state (OPEN, CLOSED, OPENING, CLOSING, STOPPED, UNKNOWN)")
         print(f"    - {config.mqtt_base_topic}/wing1 (0-100%)")
         print(f"    - {config.mqtt_base_topic}/wing2 (0-100%)")
         print(f"    - {config.mqtt_base_topic}/availability (online/offline)")

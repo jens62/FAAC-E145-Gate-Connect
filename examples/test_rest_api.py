@@ -131,7 +131,7 @@ def main():
         print_response(result)
         time.sleep(3)
 
-        # Test 4: Get Status (should show MOVING or OPEN)
+        # Test 4: Get Status (should show OPENING or OPEN)
         print_test("Test 4: Get Status (after OPEN)")
         status = api.get_status()
         print_response(status)

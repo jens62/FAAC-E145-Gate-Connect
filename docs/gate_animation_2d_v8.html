@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAAC Gate Animation - 2D View v8</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+
+        .container {
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 1400px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .wing-control {
+            background: rgba(40, 40, 40, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .wing-control h3 {
+            margin-bottom: 15px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wing-label {
+            font-size: 1.1em;
+        }
+
+        .wing-position {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #4caf50;
+            font-family: 'Courier New', monospace;
+        }
+
+        .slider-container {
+            margin-bottom: 15px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4caf50;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.5);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4caf50;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.5);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-group input[type="number"] {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1em;
+            font-family: 'Courier New', monospace;
+        }
+
+        .input-group button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            background: #4caf50;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .input-group button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .quick-btn {
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .gate-viewport {
+            width: 100%;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, #d4e6f1 0%, #e8f4f8 50%, #d0d8dc 100%);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            padding: 40px 20px;
+            overflow: hidden;
+        }
+
+        .gate-wrapper {
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: rgba(40, 40, 40, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #888;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.3em;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            color: #4caf50;
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FAAC Gate - 2D Animation v8</h1>
+        <div class="subtitle">Manual positioning - bars stay 15mm, frame grows 15mm→40mm</div>
+
+        <div class="controls-grid">
+            <!-- Wing 1 Control -->
+            <div class="wing-control">
+                <h3>
+                    <span class="wing-label">Wing 1 (Left)</span>
+                    <span class="wing-position" id="wing1-display">0%</span>
+                </h3>
+                <div class="slider-container">
+                    <input type="range" min="0" max="100" value="0" class="slider" id="wing1-slider">
+                </div>
+                <div class="input-group">
+                    <input type="number" min="0" max="100" value="0" id="wing1-input" placeholder="Position %">
+                    <button onclick="setWing1()">Set</button>
+                </div>
+                <div class="quick-buttons">
+                    <button class="quick-btn" onclick="setWing1Position(0)">0%</button>
+                    <button class="quick-btn" onclick="setWing1Position(50)">50%</button>
+                    <button class="quick-btn" onclick="setWing1Position(72)">72%</button>
+                    <button class="quick-btn" onclick="setWing1Position(100)">100%</button>
+                </div>
+            </div>
+
+            <!-- Wing 2 Control -->
+            <div class="wing-control">
+                <h3>
+                    <span class="wing-label">Wing 2 (Right)</span>
+                    <span class="wing-position" id="wing2-display">0%</span>
+                </h3>
+                <div class="slider-container">
+                    <input type="range" min="0" max="100" value="0" class="slider" id="wing2-slider">
+                </div>
+                <div class="input-group">
+                    <input type="number" min="0" max="100" value="0" id="wing2-input" placeholder="Position %">
+                    <button onclick="setWing2()">Set</button>
+                </div>
+                <div class="quick-buttons">
+                    <button class="quick-btn" onclick="setWing2Position(0)">0%</button>
+                    <button class="quick-btn" onclick="setWing2Position(50)">50%</button>
+                    <button class="quick-btn" onclick="setWing2Position(70)">70%</button>
+                    <button class="quick-btn" onclick="setWing2Position(100)">100%</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="gate-viewport">
+            <div class="gate-wrapper">
+                <svg id="gate-svg" width="3480mm" height="1330mm" viewBox="-7.5 -7.5 3480 1330" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <!-- Hinge - dark grey -->
+                        <symbol id="hinge" width="32" height="105">
+                            <rect width="32" height="105" fill="#555" />
+                            <line x1="0" y1="35" x2="32" y2="35" stroke="#888" stroke-width="1" />
+                            <line x1="0" y1="70" x2="32" y2="70" stroke="#888" stroke-width="1" />
+                        </symbol>
+
+                        <!-- Post - dark grey -->
+                        <symbol id="post">
+                            <line x1="50" y1="0" x2="50" y2="1330" stroke="#555" stroke-width="100" />
+                        </symbol>
+
+                        <!-- Wing open - 40mm line -->
+                        <symbol id="wing-open">
+                            <line x1="0" y1="0" x2="0" y2="1215" stroke="#555" stroke-width="40" />
+                        </symbol>
+                    </defs>
+
+                    <!-- Left side -->
+                    <use href="#post" x="0" y="-7.5" />
+                    <use href="#hinge" x="105.25" y="10" />
+                    <use href="#hinge" x="105.25" y="1100" />
+
+                    <!-- Left wing - manually positioned -->
+                    <g id="wing1-container">
+                        <g id="wing1-closed">
+                            <!-- Frame horizontal edges - always 15mm -->
+                            <line id="wing1-frame-top" x1="150" y1="7.5" x2="1710" y2="7.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-frame-bottom" x1="150" y1="1207.5" x2="1710" y2="1207.5" stroke="#555" stroke-width="15" />
+
+                            <!-- Frame vertical edges - grow from 15mm to 40mm -->
+                            <line id="wing1-frame-left" x1="150" y1="7.5" x2="150" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-frame-right" x1="1710" y1="7.5" x2="1710" y2="1207.5" stroke="#555" stroke-width="15" />
+
+                            <!-- Horizontal reinforcements - always 15mm -->
+                            <line id="wing1-reinf-1" x1="150" y1="242.5" x2="1710" y2="242.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-reinf-2" x1="150" y1="1092.5" x2="1710" y2="1092.5" stroke="#555" stroke-width="15" />
+
+                            <!-- Round bars - always 15mm, positions will be updated -->
+                            <line id="wing1-bar-1" x1="271.15" y1="7.5" x2="271.15" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-bar-2" x1="392.31" y1="7.5" x2="392.31" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-bar-3" x1="513.46" y1="7.5" x2="513.46" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-bar-4" x1="634.62" y1="7.5" x2="634.62" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-bar-5" x1="755.77" y1="7.5" x2="755.77" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-bar-6" x1="876.92" y1="7.5" x2="876.92" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-bar-7" x1="998.08" y1="7.5" x2="998.08" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-bar-8" x1="1119.23" y1="7.5" x2="1119.23" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-bar-9" x1="1240.38" y1="7.5" x2="1240.38" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-bar-10" x1="1361.54" y1="7.5" x2="1361.54" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-bar-11" x1="1482.69" y1="7.5" x2="1482.69" y2="1207.5" stroke="#555" stroke-width="15" />
+                            <line id="wing1-bar-12" x1="1603.85" y1="7.5" x2="1603.85" y2="1207.5" stroke="#555" stroke-width="15" />
+                        </g>
+                        <use id="wing1-open" href="#wing-open" x="125" y="-7.5" style="display: none;" />
+                    </g>
+
+                    <!-- Right side (mirrored) -->
+                    <g transform="translate(3480, 0) scale(-1, 1)">
+                        <use href="#post" x="0" y="-7.5" />
+                        <use href="#hinge" x="105.25" y="10" />
+                        <use href="#hinge" x="105.25" y="1100" />
+
+                        <!-- Right wing - manually positioned -->
+                        <g id="wing2-container">
+                            <g id="wing2-closed">
+                                <!-- Frame horizontal edges - always 15mm -->
+                                <line id="wing2-frame-top" x1="150" y1="7.5" x2="1710" y2="7.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-frame-bottom" x1="150" y1="1207.5" x2="1710" y2="1207.5" stroke="#555" stroke-width="15" />
+
+                                <!-- Frame vertical edges - grow from 15mm to 40mm -->
+                                <line id="wing2-frame-left" x1="150" y1="7.5" x2="150" y2="1207.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-frame-right" x1="1710" y1="7.5" x2="1710" y2="1207.5" stroke="#555" stroke-width="15" />
+
+                                <!-- Horizontal reinforcements - always 15mm -->
+                                <line id="wing2-reinf-1" x1="150" y1="242.5" x2="1710" y2="242.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-reinf-2" x1="150" y1="1092.5" x2="1710" y2="1092.5" stroke="#555" stroke-width="15" />
+
+                                <!-- Round bars - always 15mm, positions will be updated -->
+                                <line id="wing2-bar-1" x1="271.15" y1="7.5" x2="271.15" y2="1207.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-bar-2" x1="392.31" y1="7.5" x2="392.31" y2="1207.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-bar-3" x1="513.46" y1="7.5" x2="513.46" y2="1207.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-bar-4" x1="634.62" y1="7.5" x2="634.62" y2="1207.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-bar-5" x1="755.77" y1="7.5" x2="755.77" y2="1207.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-bar-6" x1="876.92" y1="7.5" x2="876.92" y2="1207.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-bar-7" x1="998.08" y1="7.5" x2="998.08" y2="1207.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-bar-8" x1="1119.23" y1="7.5" x2="1119.23" y2="1207.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-bar-9" x1="1240.38" y1="7.5" x2="1240.38" y2="1207.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-bar-10" x1="1361.54" y1="7.5" x2="1361.54" y2="1207.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-bar-11" x1="1482.69" y1="7.5" x2="1482.69" y2="1207.5" stroke="#555" stroke-width="15" />
+                                <line id="wing2-bar-12" x1="1603.85" y1="7.5" x2="1603.85" y2="1207.5" stroke="#555" stroke-width="15" />
+                            </g>
+                            <use id="wing2-open" href="#wing-open" x="125" y="-7.5" style="display: none;" />
+                        </g>
+                    </g>
+                </svg>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">Wing 1 Position</div>
+                <div class="stat-value" id="stat-wing1">0%</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Wing 2 Position</div>
+                <div class="stat-value" id="stat-wing2">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let wing1Position = 0;
+        let wing2Position = 0;
+
+        // Original bar positions when closed (relative to wing start at x=150)
+        const barPositions = [271.15, 392.31, 513.46, 634.62, 755.77, 876.92, 998.08, 1119.23, 1240.38, 1361.54, 1482.69, 1603.85];
+
+        const WING_START = 150;  // Left edge of wing
+        const WING_WIDTH_CLOSED = 1560;  // Full wing width when closed (1710 - 150)
+        const WING_WIDTH_OPEN = 40;  // Wing edge width when fully open
+        const FRAME_STROKE_MIN = 15;  // Vertical frame stroke when closed
+        const FRAME_STROKE_MAX = 40;  // Vertical frame stroke when open
+
+        function updateWing1Visual() {
+            const wing1Closed = document.getElementById('wing1-closed');
+            const wing1Open = document.getElementById('wing1-open');
+
+            if (wing1Position >= 100) {
+                // Fully open: show 40mm line at x=125 (covers hinges completely)
+                wing1Closed.style.display = 'none';
+                wing1Open.style.display = 'block';
+            } else {
+                wing1Closed.style.display = 'block';
+                wing1Open.style.display = 'none';
+
+                // Calculate rotation angle (0° closed, 90° open)
+                const angle = (wing1Position / 100) * (Math.PI / 2);  // Convert to radians
+                const cosAngle = Math.cos(angle);
+                const sinAngle = Math.sin(angle);
+
+                // Wing apparent width due to foreshortening
+                const apparentWidth = WING_WIDTH_CLOSED * cosAngle + WING_WIDTH_OPEN * sinAngle;
+                const wingRight = WING_START + apparentWidth;
+
+                // Update frame right edge position
+                document.getElementById('wing1-frame-top').setAttribute('x2', wingRight);
+                document.getElementById('wing1-frame-bottom').setAttribute('x2', wingRight);
+                document.getElementById('wing1-frame-right').setAttribute('x1', wingRight);
+                document.getElementById('wing1-frame-right').setAttribute('x2', wingRight);
+                document.getElementById('wing1-reinf-1').setAttribute('x2', wingRight);
+                document.getElementById('wing1-reinf-2').setAttribute('x2', wingRight);
+
+                // Update vertical frame stroke-width (15mm to 40mm)
+                const verticalStroke = FRAME_STROKE_MIN * cosAngle + FRAME_STROKE_MAX * sinAngle;
+                document.getElementById('wing1-frame-left').setAttribute('stroke-width', verticalStroke);
+                document.getElementById('wing1-frame-right').setAttribute('stroke-width', verticalStroke);
+
+                // Update bar positions (foreshortening, but keep 15mm stroke-width)
+                for (let i = 0; i < 12; i++) {
+                    const originalPos = barPositions[i];
+                    const relativePos = originalPos - WING_START;  // Position relative to wing start
+                    const newPos = WING_START + relativePos * (apparentWidth / WING_WIDTH_CLOSED);
+
+                    const bar = document.getElementById(`wing1-bar-${i + 1}`);
+                    bar.setAttribute('x1', newPos);
+                    bar.setAttribute('x2', newPos);
+                }
+            }
+
+            document.getElementById('wing1-display').textContent = `${wing1Position}%`;
+            document.getElementById('wing1-slider').value = wing1Position;
+            document.getElementById('wing1-input').value = wing1Position;
+            document.getElementById('stat-wing1').textContent = `${wing1Position}%`;
+        }
+
+        function updateWing2Visual() {
+            const wing2Closed = document.getElementById('wing2-closed');
+            const wing2Open = document.getElementById('wing2-open');
+
+            if (wing2Position >= 100) {
+                wing2Closed.style.display = 'none';
+                wing2Open.style.display = 'block';
+            } else {
+                wing2Closed.style.display = 'block';
+                wing2Open.style.display = 'none';
+
+                const angle = (wing2Position / 100) * (Math.PI / 2);
+                const cosAngle = Math.cos(angle);
+                const sinAngle = Math.sin(angle);
+
+                const apparentWidth = WING_WIDTH_CLOSED * cosAngle + WING_WIDTH_OPEN * sinAngle;
+                const wingRight = WING_START + apparentWidth;
+
+                document.getElementById('wing2-frame-top').setAttribute('x2', wingRight);
+                document.getElementById('wing2-frame-bottom').setAttribute('x2', wingRight);
+                document.getElementById('wing2-frame-right').setAttribute('x1', wingRight);
+                document.getElementById('wing2-frame-right').setAttribute('x2', wingRight);
+                document.getElementById('wing2-reinf-1').setAttribute('x2', wingRight);
+                document.getElementById('wing2-reinf-2').setAttribute('x2', wingRight);
+
+                const verticalStroke = FRAME_STROKE_MIN * cosAngle + FRAME_STROKE_MAX * sinAngle;
+                document.getElementById('wing2-frame-left').setAttribute('stroke-width', verticalStroke);
+                document.getElementById('wing2-frame-right').setAttribute('stroke-width', verticalStroke);
+
+                for (let i = 0; i < 12; i++) {
+                    const originalPos = barPositions[i];
+                    const relativePos = originalPos - WING_START;
+                    const newPos = WING_START + relativePos * (apparentWidth / WING_WIDTH_CLOSED);
+
+                    const bar = document.getElementById(`wing2-bar-${i + 1}`);
+                    bar.setAttribute('x1', newPos);
+                    bar.setAttribute('x2', newPos);
+                }
+            }
+
+            document.getElementById('wing2-display').textContent = `${wing2Position}%`;
+            document.getElementById('wing2-slider').value = wing2Position;
+            document.getElementById('wing2-input').value = wing2Position;
+            document.getElementById('stat-wing2').textContent = `${wing2Position}%`;
+        }
+
+        function setWing1Position(pos) {
+            wing1Position = Math.max(0, Math.min(100, pos));
+            updateWing1Visual();
+        }
+
+        function setWing2Position(pos) {
+            wing2Position = Math.max(0, Math.min(100, pos));
+            updateWing2Visual();
+        }
+
+        function setWing1() {
+            const input = document.getElementById('wing1-input');
+            const value = parseInt(input.value) || 0;
+            setWing1Position(value);
+        }
+
+        function setWing2() {
+            const input = document.getElementById('wing2-input');
+            const value = parseInt(input.value) || 0;
+            setWing2Position(value);
+        }
+
+        document.getElementById('wing1-slider').addEventListener('input', (e) => {
+            setWing1Position(parseInt(e.target.value));
+        });
+
+        document.getElementById('wing2-slider').addEventListener('input', (e) => {
+            setWing2Position(parseInt(e.target.value));
+        });
+
+        document.getElementById('wing1-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') setWing1();
+        });
+
+        document.getElementById('wing2-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') setWing2();
+        });
+
+        // Demo: Load with 72% and 70%
+        setTimeout(() => {
+            setWing1Position(72);
+            setWing2Position(70);
+        }, 500);
+    </script>
+</body>
+</html>

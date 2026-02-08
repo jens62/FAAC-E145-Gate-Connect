@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAAC Gate Animation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .info {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-open {
+            background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%);
+            color: white;
+        }
+
+        .btn-open:hover {
+            background: linear-gradient(135deg, #388e3c 0%, #43a047 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-close {
+            background: linear-gradient(135deg, #c62828 0%, #d32f2f 100%);
+            color: white;
+        }
+
+        .btn-close:hover {
+            background: linear-gradient(135deg, #d32f2f 0%, #e53935 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(198, 40, 40, 0.3);
+        }
+
+        .btn-toggle {
+            background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
+            color: white;
+        }
+
+        .btn-toggle:hover {
+            background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.3);
+        }
+
+        .gate-container {
+            perspective: 3000px;
+            perspective-origin: 50% 50%;
+            width: 100%;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #e3f2fd 0%, #f5f5f5 100%);
+            border-radius: 15px;
+            border: 2px solid #ddd;
+        }
+
+        .gate-wrapper {
+            transform-style: preserve-3d;
+            transform: rotateX(10deg);
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            transform-style: preserve-3d;
+        }
+
+        /* Wing groups for animation */
+        .wing-left, .wing-right {
+            transform-style: preserve-3d;
+            transition: transform 2s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-origin: center;
+        }
+
+        /* Open state - wings rotate outward */
+        .gate-open .wing-left {
+            transform: rotateY(-95deg);
+        }
+
+        .gate-open .wing-right {
+            transform: rotateY(95deg);
+        }
+
+        /* Closed state - wings in center */
+        .gate-closed .wing-left,
+        .gate-closed .wing-right {
+            transform: rotateY(0deg);
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-open {
+            background: #4caf50;
+        }
+
+        .status-closed {
+            background: #f44336;
+        }
+
+        .status-moving {
+            background: #ff9800;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .dimensions {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .dimensions h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 1em;
+        }
+
+        .dimensions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .dimensions li {
+            padding: 3px 0;
+        }
+
+        .dimensions li::before {
+            content: "▸ ";
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚪 FAAC E145 Gate Animation</h1>
+        <div class="info">Interactive 3D visualization based on actual dimensions</div>
+
+        <div class="controls">
+            <button class="btn-open" onclick="openGate()">Open Gate</button>
+            <button class="btn-close" onclick="closeGate()">Close Gate</button>
+            <button class="btn-toggle" onclick="toggleGate()">Toggle</button>
+        </div>
+
+        <div class="gate-container">
+            <div class="gate-wrapper">
+                <svg id="gate-svg" class="gate-closed" width="3480mm" height="1330mm" viewBox="-7.5 -7.5 3480 1330" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <!-- Hinge with 3D effect -->
+                        <symbol id="hinge" width="32" height="105">
+                            <rect width="32" height="105" fill="#333" />
+                            <rect x="0" y="0" width="32" height="35" fill="url(#hingeGradient)" />
+                            <rect x="0" y="35" width="32" height="35" fill="url(#hingeGradient2)" />
+                            <rect x="0" y="70" width="32" height="35" fill="url(#hingeGradient)" />
+                            <line x1="0" y1="35" x2="32" y2="35" stroke="#666" stroke-width="2" />
+                            <line x1="0" y1="70" x2="32" y2="70" stroke="#666" stroke-width="2" />
+                        </symbol>
+
+                        <!-- Post with depth -->
+                        <symbol id="post">
+                            <line x1="50" y1="0" x2="50" y2="1330" stroke="#2a2a2a" stroke-width="100" stroke-linecap="square" />
+                            <line x1="50" y1="0" x2="50" y2="1330" stroke="url(#postGradient)" stroke-width="100" stroke-linecap="square" opacity="0.5" />
+                        </symbol>
+
+                        <!-- Gate wing -->
+                        <symbol id="wing">
+                            <!-- Frame -->
+                            <rect x="7.5" y="7.5" width="1575" height="1215" fill="none" stroke="#1a1a1a" stroke-width="15" />
+
+                            <!-- Vertical bars (12 bars, 15mm diameter) -->
+                            <line x1="128.65" y1="15" x2="128.65" y2="1215" stroke="#444" stroke-width="15" stroke-linecap="round" />
+                            <line x1="249.81" y1="15" x2="249.81" y2="1215" stroke="#444" stroke-width="15" stroke-linecap="round" />
+                            <line x1="370.96" y1="15" x2="370.96" y2="1215" stroke="#444" stroke-width="15" stroke-linecap="round" />
+                            <line x1="492.12" y1="15" x2="492.12" y2="1215" stroke="#444" stroke-width="15" stroke-linecap="round" />
+                            <line x1="613.27" y1="15" x2="613.27" y2="1215" stroke="#444" stroke-width="15" stroke-linecap="round" />
+                            <line x1="734.42" y1="15" x2="734.42" y2="1215" stroke="#444" stroke-width="15" stroke-linecap="round" />
+                            <line x1="855.58" y1="15" x2="855.58" y2="1215" stroke="#444" stroke-width="15" stroke-linecap="round" />
+                            <line x1="976.73" y1="15" x2="976.73" y2="1215" stroke="#444" stroke-width="15" stroke-linecap="round" />
+                            <line x1="1097.88" y1="15" x2="1097.88" y2="1215" stroke="#444" stroke-width="15" stroke-linecap="round" />
+                            <line x1="1219.04" y1="15" x2="1219.04" y2="1215" stroke="#444" stroke-width="15" stroke-linecap="round" />
+                            <line x1="1340.19" y1="15" x2="1340.19" y2="1215" stroke="#444" stroke-width="15" stroke-linecap="round" />
+                            <line x1="1461.35" y1="15" x2="1461.35" y2="1215" stroke="#444" stroke-width="15" stroke-linecap="round" />
+
+                            <!-- Horizontal reinforcements -->
+                            <line x1="15" y1="250" x2="1575" y2="250" stroke="#1a1a1a" stroke-width="15" />
+                            <line x1="15" y1="1100" x2="1575" y2="1100" stroke="#1a1a1a" stroke-width="15" />
+                        </symbol>
+
+                        <!-- Gradients for 3D effect -->
+                        <linearGradient id="postGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#000;stop-opacity:0.3" />
+                            <stop offset="50%" style="stop-color:#fff;stop-opacity:0.2" />
+                            <stop offset="100%" style="stop-color:#000;stop-opacity:0.3" />
+                        </linearGradient>
+
+                        <linearGradient id="hingeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#000;stop-opacity:0.5" />
+                            <stop offset="50%" style="stop-color:#fff;stop-opacity:0.3" />
+                            <stop offset="100%" style="stop-color:#000;stop-opacity:0.5" />
+                        </linearGradient>
+
+                        <linearGradient id="hingeGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#fff;stop-opacity:0.2" />
+                            <stop offset="50%" style="stop-color:#000;stop-opacity:0.3" />
+                            <stop offset="100%" style="stop-color:#fff;stop-opacity:0.2" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Left wing group -->
+                    <g class="wing-left">
+                        <use href="#post" x="0" y="-7.5" />
+                        <use href="#hinge" x="105.25" y="10" />
+                        <use href="#hinge" x="105.25" y="1100" />
+                        <use href="#wing" x="142.5" y="-7.5" />
+                    </g>
+
+                    <!-- Right wing group (mirrored) -->
+                    <g class="wing-right" transform="translate(3480, 0) scale(-1, 1)">
+                        <use href="#post" x="0" y="-7.5" />
+                        <use href="#hinge" x="105.25" y="10" />
+                        <use href="#hinge" x="105.25" y="1100" />
+                        <use href="#wing" x="142.5" y="-7.5" />
+                    </g>
+                </svg>
+            </div>
+        </div>
+
+        <div class="status">
+            <span class="status-indicator status-closed"></span>
+            <span id="status-text">CLOSED</span>
+        </div>
+
+        <div class="dimensions">
+            <h3>Gate Specifications</h3>
+            <ul>
+                <li>Posts: 100mm × 100mm square cross-section</li>
+                <li>Hinges: Ø32mm cylinders</li>
+                <li>Frame: 40mm × 15mm steel strip</li>
+                <li>Reinforcements: 40mm × 15mm steel strip (horizontal)</li>
+                <li>Bars: Ø15mm round bars (12 per wing, vertical)</li>
+                <li>Gate width: 3480mm total (1740mm per wing)</li>
+                <li>Gate height: 1330mm</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let isOpen = false;
+        let isMoving = false;
+
+        function updateStatus(state) {
+            const statusText = document.getElementById('status-text');
+            const indicator = document.querySelector('.status-indicator');
+
+            indicator.className = 'status-indicator';
+
+            if (state === 'OPEN') {
+                statusText.textContent = 'OPEN';
+                indicator.classList.add('status-open');
+            } else if (state === 'CLOSED') {
+                statusText.textContent = 'CLOSED';
+                indicator.classList.add('status-closed');
+            } else if (state === 'MOVING') {
+                statusText.textContent = 'MOVING';
+                indicator.classList.add('status-moving');
+            }
+        }
+
+        function openGate() {
+            if (isOpen || isMoving) return;
+
+            const svg = document.getElementById('gate-svg');
+            svg.classList.remove('gate-closed');
+            svg.classList.add('gate-open');
+
+            isMoving = true;
+            updateStatus('MOVING');
+
+            setTimeout(() => {
+                isOpen = true;
+                isMoving = false;
+                updateStatus('OPEN');
+            }, 2000); // Match CSS transition duration
+        }
+
+        function closeGate() {
+            if (!isOpen || isMoving) return;
+
+            const svg = document.getElementById('gate-svg');
+            svg.classList.remove('gate-open');
+            svg.classList.add('gate-closed');
+
+            isMoving = true;
+            updateStatus('MOVING');
+
+            setTimeout(() => {
+                isOpen = false;
+                isMoving = false;
+                updateStatus('CLOSED');
+            }, 2000);
+        }
+
+        function toggleGate() {
+            if (isOpen) {
+                closeGate();
+            } else {
+                openGate();
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'o' || e.key === 'O') openGate();
+            if (e.key === 'c' || e.key === 'C') closeGate();
+            if (e.key === ' ' || e.key === 't' || e.key === 'T') {
+                e.preventDefault();
+                toggleGate();
+            }
+        });
+
+        // Initialize
+        updateStatus('CLOSED');
+    </script>
+</body>
+</html>

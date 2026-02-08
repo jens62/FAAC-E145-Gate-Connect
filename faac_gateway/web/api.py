@@ -57,7 +57,7 @@ def get_status():
         JSON with gate status including:
         - wing1: Position of wing 1 (0-100%)
         - wing2: Position of wing 2 (0-100%)
-        - state: Gate state (OPEN/CLOSED/MOVING/STOPPED/UNKNOWN)
+        - state: Gate state (OPEN/CLOSED/OPENING/CLOSING/STOPPED/UNKNOWN)
         - online: Connection status (true/false)
 
     Example:

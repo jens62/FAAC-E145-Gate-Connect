@@ -36,7 +36,8 @@ def on_message(client, userdata, msg):
         emoji = {
             "OPEN": "🟢",
             "CLOSED": "🔴",
-            "MOVING": "🟡",
+            "OPENING": "🟡",
+            "CLOSING": "🟠",
             "STOPPED": "🔵",
             "UNKNOWN": "⚪"
         }.get(payload, "⚪")

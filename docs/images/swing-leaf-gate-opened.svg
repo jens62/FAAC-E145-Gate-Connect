@@ -1,0 +1,22 @@
+<svg width="3480mm" height="1330mm" viewBox="-7.5 -7.5 3480 1330" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <symbol id="post">
+      <line x1="50" y1="0" x2="50" y2="1330" stroke="black" stroke-width="100" />
+    </symbol>
+    
+    <symbol id="wing-open">
+      <!-- The 40mm wide edge of the frame, centered on x=0 -->
+      <line x1="0" y1="0" x2="0" y2="1215" stroke="black" stroke-width="40" />
+    </symbol>
+  </defs>
+  
+  <!-- Left side -->
+  <use href="#post" x="0" y="-7.5" />
+  <use href="#wing-open" x="125" y="-7.5" />
+  
+  <!-- Right side (mirrored) -->
+  <g transform="translate(3480, 0) scale(-1, 1)">
+    <use href="#post" x="0" y="-7.5" />
+    <use href="#wing-open" x="125" y="-7.5" />
+  </g>
+</svg>

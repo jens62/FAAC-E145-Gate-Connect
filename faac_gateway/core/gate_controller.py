@@ -189,9 +189,10 @@ class GateController:
         # Handle text commands
         command_lower = normalized['command']
 
-        # HomeKit-style stop: If gate is MOVING and same command sent again, treat as STOP
-        if self.status['state'] == "MOVING" and command_lower == self.last_command:
-            logger.info(f"HomeKit-style stop: '{command_lower}' sent while already moving in that direction")
+        # HomeKit-style stop: If gate is OPENING/CLOSING and same command sent again, treat as STOP
+        current_state = self.status['state']
+        if current_state in ("OPENING", "CLOSING") and command_lower == self.last_command:
+            logger.info(f"HomeKit-style stop: '{command_lower}' sent while already {current_state.lower()}")
             command_lower = "stop"
 
         # Send command
@@ -300,13 +301,13 @@ class GateController:
 
                             if current_pos < target:
                                 # Need to open more
-                                if state != "MOVING" or state == "STOPPED":
+                                if state not in ("OPENING", "CLOSING") or state == "STOPPED":
                                     logger.debug(f"Position control: opening (current={current_pos}%, target={target}%)")
                                     os.write(fd, bytes.fromhex(FaacProtocol.COMMANDS["open"]))
                                     time.sleep(0.5)
                             elif current_pos > target:
                                 # Need to close more
-                                if state != "MOVING" or state == "STOPPED":
+                                if state not in ("OPENING", "CLOSING") or state == "STOPPED":
                                     logger.debug(f"Position control: closing (current={current_pos}%, target={target}%)")
                                     os.write(fd, bytes.fromhex(FaacProtocol.COMMANDS["close"]))
                                     time.sleep(0.5)

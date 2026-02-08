@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAAC Gate - Independent Wing Position Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+
+        .container {
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 1400px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .wing-control {
+            background: rgba(40, 40, 40, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .wing-control h3 {
+            margin-bottom: 15px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wing-label {
+            font-size: 1.1em;
+        }
+
+        .wing-position {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #4caf50;
+            font-family: 'Courier New', monospace;
+        }
+
+        .slider-container {
+            margin-bottom: 15px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4caf50;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.5);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4caf50;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.5);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-group input[type="number"] {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1em;
+            font-family: 'Courier New', monospace;
+        }
+
+        .input-group button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            background: #4caf50;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .input-group button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .quick-btn {
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .gate-viewport {
+            perspective: 2500px;
+            perspective-origin: 50% 40%;
+            width: 100%;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            background: linear-gradient(to bottom, #1a2332 0%, #2a2a2a 100%);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .scene-3d {
+            transform-style: preserve-3d;
+            transform: rotateX(15deg) rotateY(0deg);
+            width: 100%;
+            max-width: 1100px;
+            transition: transform 0.3s;
+        }
+
+        .gate-svg-wrapper {
+            transform-style: preserve-3d;
+        }
+
+        svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
+        }
+
+        .wing-group {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .difference-indicator {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 152, 0, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 152, 0, 0.3);
+        }
+
+        .difference-indicator.small {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+
+        .difference-indicator.large {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: rgba(244, 67, 54, 0.3);
+        }
+
+        .difference-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: rgba(40, 40, 40, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #888;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.3em;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            color: #4caf50;
+        }
+
+        .help-text {
+            text-align: center;
+            color: #666;
+            font-size: 0.85em;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        /* Angle markers in viewport */
+        .angle-marker {
+            position: absolute;
+            bottom: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-family: 'Courier New', monospace;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .angle-marker-left {
+            left: 20px;
+            color: #64b5f6;
+        }
+
+        .angle-marker-right {
+            right: 20px;
+            color: #81c784;
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FAAC Gate - Independent Wing Position</h1>
+        <div class="subtitle">See subtle differences between wing positions (72% vs 70% example)</div>
+
+        <div class="controls-grid">
+            <!-- Wing 1 Control -->
+            <div class="wing-control">
+                <h3>
+                    <span class="wing-label">Wing 1 (Left)</span>
+                    <span class="wing-position" id="wing1-display">0%</span>
+                </h3>
+                <div class="slider-container">
+                    <input type="range" min="0" max="100" value="0" class="slider" id="wing1-slider">
+                </div>
+                <div class="input-group">
+                    <input type="number" min="0" max="100" value="0" id="wing1-input" placeholder="Position %">
+                    <button onclick="setWing1()">Set</button>
+                </div>
+                <div class="quick-buttons">
+                    <button class="quick-btn" onclick="setWing1Position(0)">0%</button>
+                    <button class="quick-btn" onclick="setWing1Position(25)">25%</button>
+                    <button class="quick-btn" onclick="setWing1Position(50)">50%</button>
+                    <button class="quick-btn" onclick="setWing1Position(72)">72%</button>
+                    <button class="quick-btn" onclick="setWing1Position(75)">75%</button>
+                    <button class="quick-btn" onclick="setWing1Position(90)">90%</button>
+                    <button class="quick-btn" onclick="setWing1Position(100)">100%</button>
+                </div>
+            </div>
+
+            <!-- Wing 2 Control -->
+            <div class="wing-control">
+                <h3>
+                    <span class="wing-label">Wing 2 (Right)</span>
+                    <span class="wing-position" id="wing2-display">0%</span>
+                </h3>
+                <div class="slider-container">
+                    <input type="range" min="0" max="100" value="0" class="slider" id="wing2-slider">
+                </div>
+                <div class="input-group">
+                    <input type="number" min="0" max="100" value="0" id="wing2-input" placeholder="Position %">
+                    <button onclick="setWing2()">Set</button>
+                </div>
+                <div class="quick-buttons">
+                    <button class="quick-btn" onclick="setWing2Position(0)">0%</button>
+                    <button class="quick-btn" onclick="setWing2Position(25)">25%</button>
+                    <button class="quick-btn" onclick="setWing2Position(50)">50%</button>
+                    <button class="quick-btn" onclick="setWing2Position(70)">70%</button>
+                    <button class="quick-btn" onclick="setWing2Position(75)">75%</button>
+                    <button class="quick-btn" onclick="setWing2Position(90)">90%</button>
+                    <button class="quick-btn" onclick="setWing2Position(100)">100%</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="difference-indicator" id="difference-indicator">
+            <div class="stat-label">Position Difference</div>
+            <div class="difference-value" id="difference-value">0%</div>
+            <div class="help-text" id="difference-help">Wings are synchronized</div>
+        </div>
+
+        <div class="gate-viewport">
+            <div class="angle-marker angle-marker-left" id="angle-left">0.0°</div>
+            <div class="angle-marker angle-marker-right" id="angle-right">0.0°</div>
+
+            <div class="scene-3d">
+                <div class="gate-svg-wrapper">
+                    <svg width="3480mm" height="1330mm" viewBox="-7.5 -7.5 3480 1330" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <!-- Hinge definition -->
+                            <symbol id="hinge" width="32" height="105">
+                                <rect width="32" height="105" fill="#2a2a2a" rx="3" />
+                                <rect x="2" y="2" width="28" height="101" fill="url(#hingeGradient)" rx="2" />
+                                <circle cx="16" cy="35" r="6" fill="#1a1a1a" />
+                                <circle cx="16" cy="70" r="6" fill="#1a1a1a" />
+                                <circle cx="16" cy="35" r="3" fill="#444" />
+                                <circle cx="16" cy="70" r="3" fill="#444" />
+                            </symbol>
+
+                            <!-- Post definition -->
+                            <symbol id="post">
+                                <rect x="0" y="0" width="100" height="1330" fill="#1a1a1a" />
+                                <rect x="0" y="0" width="100" height="1330" fill="url(#postGradient)" />
+                            </symbol>
+
+                            <!-- Gate wing -->
+                            <symbol id="wing">
+                                <!-- Frame -->
+                                <rect x="7.5" y="7.5" width="1575" height="1215" fill="none" stroke="#0d0d0d" stroke-width="15" />
+                                <rect x="7.5" y="7.5" width="1575" height="1215" fill="none" stroke="url(#frameGradient)" stroke-width="15" opacity="0.5" />
+
+                                <!-- Vertical bars with realistic shading -->
+                                <g class="vertical-bars">
+                                    <line x1="128.65" y1="15" x2="128.65" y2="1215" stroke="#2a2a2a" stroke-width="15" stroke-linecap="round" />
+                                    <line x1="249.81" y1="15" x2="249.81" y2="1215" stroke="#2a2a2a" stroke-width="15" stroke-linecap="round" />
+                                    <line x1="370.96" y1="15" x2="370.96" y2="1215" stroke="#2a2a2a" stroke-width="15" stroke-linecap="round" />
+                                    <line x1="492.12" y1="15" x2="492.12" y2="1215" stroke="#2a2a2a" stroke-width="15" stroke-linecap="round" />
+                                    <line x1="613.27" y1="15" x2="613.27" y2="1215" stroke="#2a2a2a" stroke-width="15" stroke-linecap="round" />
+                                    <line x1="734.42" y1="15" x2="734.42" y2="1215" stroke="#2a2a2a" stroke-width="15" stroke-linecap="round" />
+                                    <line x1="855.58" y1="15" x2="855.58" y2="1215" stroke="#2a2a2a" stroke-width="15" stroke-linecap="round" />
+                                    <line x1="976.73" y1="15" x2="976.73" y2="1215" stroke="#2a2a2a" stroke-width="15" stroke-linecap="round" />
+                                    <line x1="1097.88" y1="15" x2="1097.88" y2="1215" stroke="#2a2a2a" stroke-width="15" stroke-linecap="round" />
+                                    <line x1="1219.04" y1="15" x2="1219.04" y2="1215" stroke="#2a2a2a" stroke-width="15" stroke-linecap="round" />
+                                    <line x1="1340.19" y1="15" x2="1340.19" y2="1215" stroke="#2a2a2a" stroke-width="15" stroke-linecap="round" />
+                                    <line x1="1461.35" y1="15" x2="1461.35" y2="1215" stroke="#2a2a2a" stroke-width="15" stroke-linecap="round" />
+                                </g>
+
+                                <!-- Horizontal reinforcements -->
+                                <line x1="15" y1="250" x2="1575" y2="250" stroke="#0d0d0d" stroke-width="15" />
+                                <line x1="15" y1="1100" x2="1575" y2="1100" stroke="#0d0d0d" stroke-width="15" />
+                            </symbol>
+
+                            <!-- Gradients -->
+                            <linearGradient id="postGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#000;stop-opacity:0.5" />
+                                <stop offset="30%" style="stop-color:#444;stop-opacity:0.3" />
+                                <stop offset="70%" style="stop-color:#666;stop-opacity:0.2" />
+                                <stop offset="100%" style="stop-color:#000;stop-opacity:0.5" />
+                            </linearGradient>
+
+                            <linearGradient id="hingeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#000;stop-opacity:0.6" />
+                                <stop offset="50%" style="stop-color:#555;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#000;stop-opacity:0.6" />
+                            </linearGradient>
+
+                            <linearGradient id="frameGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#666;stop-opacity:0.4" />
+                                <stop offset="50%" style="stop-color:#999;stop-opacity:0.2" />
+                                <stop offset="100%" style="stop-color:#666;stop-opacity:0.4" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Left wing group -->
+                        <g id="wing1-group" class="wing-group" transform-origin="137.25 665">
+                            <use href="#post" x="0" y="-7.5" />
+                            <use href="#hinge" x="105.25" y="10" />
+                            <use href="#hinge" x="105.25" y="1100" />
+                            <use href="#wing" x="142.5" y="-7.5" />
+                        </g>
+
+                        <!-- Right wing group (mirrored) -->
+                        <g id="wing2-group" class="wing-group" transform-origin="3342.75 665">
+                            <g transform="translate(3480, 0) scale(-1, 1)">
+                                <use href="#post" x="0" y="-7.5" />
+                                <use href="#hinge" x="105.25" y="10" />
+                                <use href="#hinge" x="105.25" y="1100" />
+                                <use href="#wing" x="142.5" y="-7.5" />
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">Wing 1 Position</div>
+                <div class="stat-value" id="stat-wing1">0%</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Wing 2 Position</div>
+                <div class="stat-value" id="stat-wing2">0%</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Wing 1 Angle</div>
+                <div class="stat-value" id="stat-angle1">0.0°</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Wing 2 Angle</div>
+                <div class="stat-value" id="stat-angle2">0.0°</div>
+            </div>
+        </div>
+
+        <div class="help-text">
+            💡 Try setting Wing 1 to 72% and Wing 2 to 70% to see the subtle difference (2%)
+        </div>
+    </div>
+
+    <script>
+        let wing1Position = 0;
+        let wing2Position = 0;
+
+        // Convert position (0-100%) to rotation angle (0-90°)
+        function positionToAngle(position) {
+            return (position / 100) * 90;
+        }
+
+        function updateWing1Visual() {
+            const angle = positionToAngle(wing1Position);
+            const wing1Group = document.getElementById('wing1-group');
+            wing1Group.style.transform = `rotateY(-${angle}deg)`;
+
+            // Update displays
+            document.getElementById('wing1-display').textContent = `${wing1Position}%`;
+            document.getElementById('wing1-slider').value = wing1Position;
+            document.getElementById('wing1-input').value = wing1Position;
+            document.getElementById('stat-wing1').textContent = `${wing1Position}%`;
+            document.getElementById('stat-angle1').textContent = `${angle.toFixed(1)}°`;
+            document.getElementById('angle-left').textContent = `${angle.toFixed(1)}°`;
+
+            updateDifference();
+        }
+
+        function updateWing2Visual() {
+            const angle = positionToAngle(wing2Position);
+            const wing2Group = document.getElementById('wing2-group');
+            wing2Group.style.transform = `rotateY(${angle}deg)`;
+
+            // Update displays
+            document.getElementById('wing2-display').textContent = `${wing2Position}%`;
+            document.getElementById('wing2-slider').value = wing2Position;
+            document.getElementById('wing2-input').value = wing2Position;
+            document.getElementById('stat-wing2').textContent = `${wing2Position}%`;
+            document.getElementById('stat-angle2').textContent = `${angle.toFixed(1)}°`;
+            document.getElementById('angle-right').textContent = `${angle.toFixed(1)}°`;
+
+            updateDifference();
+        }
+
+        function updateDifference() {
+            const diff = Math.abs(wing1Position - wing2Position);
+            const diffValue = document.getElementById('difference-value');
+            const diffHelp = document.getElementById('difference-help');
+            const diffIndicator = document.getElementById('difference-indicator');
+
+            diffValue.textContent = `${diff}%`;
+
+            // Update indicator styling and message based on difference
+            diffIndicator.className = 'difference-indicator';
+            if (diff === 0) {
+                diffIndicator.classList.add('small');
+                diffHelp.textContent = '✓ Wings are perfectly synchronized';
+            } else if (diff <= 5) {
+                diffIndicator.classList.add('small');
+                diffHelp.textContent = `⚠ Small difference - look carefully at wing angles (${(positionToAngle(wing1Position) - positionToAngle(wing2Position)).toFixed(1)}° difference)`;
+            } else {
+                diffIndicator.classList.add('large');
+                diffHelp.textContent = `⚠ Significant difference - wings are not synchronized`;
+            }
+        }
+
+        function setWing1Position(pos) {
+            wing1Position = Math.max(0, Math.min(100, pos));
+            updateWing1Visual();
+        }
+
+        function setWing2Position(pos) {
+            wing2Position = Math.max(0, Math.min(100, pos));
+            updateWing2Visual();
+        }
+
+        function setWing1() {
+            const input = document.getElementById('wing1-input');
+            const value = parseInt(input.value) || 0;
+            setWing1Position(value);
+        }
+
+        function setWing2() {
+            const input = document.getElementById('wing2-input');
+            const value = parseInt(input.value) || 0;
+            setWing2Position(value);
+        }
+
+        // Event listeners for sliders
+        document.getElementById('wing1-slider').addEventListener('input', (e) => {
+            setWing1Position(parseInt(e.target.value));
+        });
+
+        document.getElementById('wing2-slider').addEventListener('input', (e) => {
+            setWing2Position(parseInt(e.target.value));
+        });
+
+        // Event listeners for input fields (Enter key)
+        document.getElementById('wing1-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') setWing1();
+        });
+
+        document.getElementById('wing2-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') setWing2();
+        });
+
+        // Demo: Set example positions (72% and 70%)
+        setTimeout(() => {
+            setWing1Position(72);
+            setWing2Position(70);
+        }, 500);
+    </script>
+</body>
+</html>

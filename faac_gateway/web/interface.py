@@ -366,7 +366,8 @@ def create_app(gate_controller, mqtt_enabled=False, config=None):
         const stateColors = {{
             "OPEN": "#4caf50",
             "CLOSED": "#f44336",
-            "MOVING": "#ffb300",
+            "OPENING": "#66bb6a",
+            "CLOSING": "#ef5350",
             "STOPPED": "#00bcd4",
             "UNKNOWN": "#757575"
         }};
