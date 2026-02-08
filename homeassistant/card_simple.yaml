@@ -1,0 +1,10 @@
+# Simple Tile Card for FAAC Gate
+# Basic gate control with open/close buttons and position slider
+
+type: tile
+entity: cover.faac_gate
+name: FAAC Gate
+icon: mdi:gate
+features:
+  - type: cover-open-close
+  - type: cover-position

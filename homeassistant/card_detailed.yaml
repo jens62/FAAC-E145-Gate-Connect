@@ -1,0 +1,33 @@
+# Detailed Card for FAAC Gate
+# Main control plus detailed status information
+
+type: vertical-stack
+cards:
+  # Main gate control
+  - type: tile
+    entity: cover.faac_gate
+    name: FAAC Gate
+    icon: mdi:gate
+    features:
+      - type: cover-open-close
+      - type: cover-position
+
+  # Status details
+  - type: entities
+    title: Gate Status
+    entities:
+      - entity: sensor.faac_gate_state
+        name: State
+        icon: mdi:gate-alert
+      - entity: sensor.faac_gate_wing1
+        name: Wing 1 Position
+        icon: mdi:gate-open
+      - entity: sensor.faac_gate_wing2
+        name: Wing 2 Position
+        icon: mdi:gate-open
+      - entity: binary_sensor.faac_gateway_connection
+        name: Gateway
+        icon: mdi:connection
+      - entity: sensor.faac_gate_last_seen
+        name: Last Response
+        icon: mdi:clock-check

@@ -1,0 +1,16 @@
+# Glance Card for FAAC Gate
+# Compact view showing gate and all sensors at a glance
+
+type: glance
+title: FAAC Gate
+entities:
+  - entity: cover.faac_gate
+    name: Gate
+  - entity: sensor.faac_gate_state
+    name: State
+  - entity: sensor.faac_gate_wing1
+    name: Wing 1
+  - entity: sensor.faac_gate_wing2
+    name: Wing 2
+show_name: true
+show_state: true

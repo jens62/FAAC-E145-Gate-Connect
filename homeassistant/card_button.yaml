@@ -1,0 +1,63 @@
+# Custom Button Card for FAAC Gate
+# Requires custom:button-card from HACS
+# Install: HACS -> Frontend -> Search "button-card"
+# Features: Color-coded states, tap/hold/double-tap actions
+
+type: custom:button-card
+entity: cover.faac_gate
+name: FAAC Gate
+icon: mdi:gate
+show_state: true
+show_last_changed: true
+
+# Card styling
+styles:
+  card:
+    - height: 100px
+  icon:
+    - width: 60px
+    - height: 60px
+
+# State-specific styling
+state:
+  - value: "open"
+    styles:
+      card:
+        - background-color: "#4caf50"
+      icon:
+        - color: white
+  - value: "closed"
+    styles:
+      card:
+        - background-color: "#f44336"
+      icon:
+        - color: white
+  - value: "opening"
+    styles:
+      card:
+        - background-color: "#66bb6a"
+      icon:
+        - color: white
+  - value: "closing"
+    styles:
+      card:
+        - background-color: "#ef5350"
+      icon:
+        - color: white
+  - value: "stopped"
+    styles:
+      card:
+        - background-color: "#00bcd4"
+      icon:
+        - color: white
+
+# Actions
+tap_action:
+  action: more-info
+hold_action:
+  action: toggle
+double_tap_action:
+  action: call-service
+  service: cover.stop_cover
+  service_data:
+    entity_id: cover.faac_gate

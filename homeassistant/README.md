@@ -43,13 +43,32 @@ You can either:
 
 ### 4. Add Dashboard Card
 
-The gate will appear as a Cover entity. You can add it to your dashboard using the provided `dashboard_card.yaml` as a reference.
+The gate will appear as a Cover entity. Choose one of the provided dashboard card examples:
+
+- `card_simple.yaml` - Basic tile with open/close/position controls
+- `card_detailed.yaml` - Tile + detailed status entities
+- `card_glance.yaml` - Compact glance view
+- `card_picture.yaml` - Picture overlay with controls
+- `card_button.yaml` - Custom styled button (requires HACS button-card)
 
 ## Files
 
+### Configuration
 - **configuration.yaml** - MQTT sensor and cover entity definitions
-- **dashboard_card.yaml** - Example Lovelace dashboard card
-- **automations_examples.yaml** - Example automations (close at sunset, etc.)
+
+### Dashboard Cards (choose one or combine)
+- **card_simple.yaml** - Basic tile card
+- **card_detailed.yaml** - Detailed status card
+- **card_glance.yaml** - Compact glance card
+- **card_picture.yaml** - Picture overlay card
+- **card_button.yaml** - Custom button card (requires HACS)
+
+### Automations
+- **automations_examples.yaml** - 10 example automations
+
+### Documentation
+- **SETUP.md** - Step-by-step setup guide
+- **README.md** - This file
 
 ## MQTT Topics
 

@@ -1,0 +1,18 @@
+# Picture Card for FAAC Gate
+# Shows gate image/camera with entity controls overlay
+
+type: picture-glance
+title: FAAC Gate
+
+# Replace with your gate image path or camera entity
+# Option 1: Static image in /config/www/ directory
+image: /local/gate_image.jpg
+
+# Option 2: Use a camera feed (uncomment and adjust)
+# camera_image: camera.driveway_camera
+
+entities:
+  - cover.faac_gate
+  - sensor.faac_gate_state
+  - binary_sensor.faac_gateway_connection
+camera_view: auto

@@ -82,9 +82,15 @@ After restart, check that entities are created:
 1. Go to your dashboard
 2. Click **Edit Dashboard** (three dots menu)
 3. Click **+ Add Card**
-4. Choose "Cover" or paste YAML from `dashboard_card.yaml`
-5. Select `cover.faac_gate`
-6. Click **Save**
+4. Choose one of these options:
+   - **Easy**: Select "Cover" card type, then choose `cover.faac_gate`
+   - **Custom**: Switch to YAML mode and paste from one of:
+     - `card_simple.yaml` - Basic control
+     - `card_detailed.yaml` - With status info
+     - `card_glance.yaml` - Compact view
+     - `card_picture.yaml` - With image
+     - `card_button.yaml` - Custom styled (requires HACS)
+5. Click **Save**
 
 ### Step 7: Test Control
 
