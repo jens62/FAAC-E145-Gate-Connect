@@ -50,6 +50,8 @@ Subscribe to status updates:
 Publish commands:
 - `faac/gate/command` - Send commands: `open`, `close`, `stop`
 
+![MQTT Topics in Action](docs/images/faac-gateway-mqtt-with-mask.png)
+
 See [MQTT documentation](docs/MQTT.md) for detailed integration guides.
 
 ## REST API
