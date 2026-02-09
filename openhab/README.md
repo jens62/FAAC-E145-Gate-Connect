@@ -2,6 +2,8 @@
 
 Complete OpenHAB configuration for controlling the FAAC E145 gate via MQTT with HomeKit support.
 
+![OpenHAB Sitemap with Gate Control](../docs/images/openHAB.png)
+
 ## 🎯 Key Features
 
 - ✅ **Direct position control (0-100%)** - NO RULES NEEDED!
