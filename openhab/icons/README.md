@@ -65,7 +65,7 @@ OpenHAB will automatically select the appropriate icon based on the item state.
 For a `Rollershutter` item representing the gate position:
 
 ```
-Slider item=FAAC_Gate icon="gate"
+Default item=Hoftor icon="gate"
 ```
 
 OpenHAB icon selection (based on transformed Rollershutter state):

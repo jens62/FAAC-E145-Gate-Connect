@@ -7,7 +7,7 @@ sitemap faac_gate label="Hoftor Steuerung" {
     Frame label="Hoftor Kontrolle" {
         // Simple rollershutter control - just like your KNX shutters!
         // Server-side mapping ensures 0%/100% become "close"/"open" commands
-        Default item=Hoftor
+        Default item=Hoftor icon="gate"
     }
 
     Frame label="Detaillierte Ansicht" {
