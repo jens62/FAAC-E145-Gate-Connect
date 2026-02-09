@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="3480" height="1330" viewBox="-7.5 -7.5 3480 1330" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Hinge symbol -->
+    <symbol id="hinge" width="32" height="105">
+      <rect width="32" height="105" fill="#555" />
+      <line x1="0" y1="35" x2="32" y2="35" stroke="#888" stroke-width="1" />
+      <line x1="0" y1="70" x2="32" y2="70" stroke="#888" stroke-width="1" />
+    </symbol>
+
+    <!-- Post symbol -->
+    <symbol id="post">
+      <line x1="50" y1="0" x2="50" y2="1330" stroke="#555" stroke-width="100" />
+    </symbol>
+  </defs>
+
+  <!-- Background (light blue gradient) -->
+  <rect x="-7.5" y="-7.5" width="3480" height="1330" fill="url(#bg-gradient)" />
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4e6f1;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#e8f4f8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d0d8dc;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Left side -->
+  <use href="#post" x="0" y="-7.5" />
+  <use href="#hinge" x="105.25" y="10" />
+  <use href="#hinge" x="105.25" y="1100" />
+
+  <!-- Left wing -->
+  <g id="wing1">
+    <!-- Frame horizontal edges -->
+    <line x1="115.12" y1="7.5" x2="872.61" y2="7.5" stroke="#555" stroke-width="15" />
+    <line x1="115.12" y1="1207.5" x2="872.61" y2="1207.5" stroke="#555" stroke-width="15" />
+
+    <!-- Frame vertical edges -->
+    <line x1="136.35" y1="7.5" x2="136.35" y2="1207.5" stroke="#555" stroke-width="42.45" />
+    <line x1="851.38" y1="7.5" x2="851.38" y2="1207.5" stroke="#555" stroke-width="42.45" />
+
+    <!-- Horizontal reinforcements -->
+    <line x1="136.35" y1="242.5" x2="851.38" y2="242.5" stroke="#555" stroke-width="15" />
+    <line x1="136.35" y1="1092.5" x2="851.38" y2="1092.5" stroke="#555" stroke-width="15" />
+
+    <!-- Vertical bars -->
+    <line x1="191.35" y1="7.5" x2="191.35" y2="1207.5" stroke="#555" stroke-width="15" />
+    <line x1="246.36" y1="7.5" x2="246.36" y2="1207.5" stroke="#555" stroke-width="15" />
+    <line x1="301.36" y1="7.5" x2="301.36" y2="1207.5" stroke="#555" stroke-width="15" />
+    <line x1="356.36" y1="7.5" x2="356.36" y2="1207.5" stroke="#555" stroke-width="15" />
+    <line x1="411.36" y1="7.5" x2="411.36" y2="1207.5" stroke="#555" stroke-width="15" />
+    <line x1="466.36" y1="7.5" x2="466.36" y2="1207.5" stroke="#555" stroke-width="15" />
+    <line x1="521.37" y1="7.5" x2="521.37" y2="1207.5" stroke="#555" stroke-width="15" />
+    <line x1="576.37" y1="7.5" x2="576.37" y2="1207.5" stroke="#555" stroke-width="15" />
+    <line x1="631.37" y1="7.5" x2="631.37" y2="1207.5" stroke="#555" stroke-width="15" />
+    <line x1="686.38" y1="7.5" x2="686.38" y2="1207.5" stroke="#555" stroke-width="15" />
+    <line x1="741.38" y1="7.5" x2="741.38" y2="1207.5" stroke="#555" stroke-width="15" />
+    <line x1="796.38" y1="7.5" x2="796.38" y2="1207.5" stroke="#555" stroke-width="15" />
+  </g>
+
+  <!-- Right side (mirrored) -->
+  <g transform="translate(3480, 0) scale(-1, 1)">
+    <use href="#post" x="0" y="-7.5" />
+    <use href="#hinge" x="105.25" y="10" />
+    <use href="#hinge" x="105.25" y="1100" />
+
+    <!-- Right wing -->
+    <g id="wing2">
+      <!-- Frame horizontal edges -->
+      <line x1="115.12" y1="7.5" x2="872.61" y2="7.5" stroke="#555" stroke-width="15" />
+      <line x1="115.12" y1="1207.5" x2="872.61" y2="1207.5" stroke="#555" stroke-width="15" />
+
+      <!-- Frame vertical edges -->
+      <line x1="136.35" y1="7.5" x2="136.35" y2="1207.5" stroke="#555" stroke-width="42.45" />
+      <line x1="851.38" y1="7.5" x2="851.38" y2="1207.5" stroke="#555" stroke-width="42.45" />
+
+      <!-- Horizontal reinforcements -->
+      <line x1="136.35" y1="242.5" x2="851.38" y2="242.5" stroke="#555" stroke-width="15" />
+      <line x1="136.35" y1="1092.5" x2="851.38" y2="1092.5" stroke="#555" stroke-width="15" />
+
+      <!-- Vertical bars -->
+      <line x1="191.35" y1="7.5" x2="191.35" y2="1207.5" stroke="#555" stroke-width="15" />
+      <line x1="246.36" y1="7.5" x2="246.36" y2="1207.5" stroke="#555" stroke-width="15" />
+      <line x1="301.36" y1="7.5" x2="301.36" y2="1207.5" stroke="#555" stroke-width="15" />
+      <line x1="356.36" y1="7.5" x2="356.36" y2="1207.5" stroke="#555" stroke-width="15" />
+      <line x1="411.36" y1="7.5" x2="411.36" y2="1207.5" stroke="#555" stroke-width="15" />
+      <line x1="466.36" y1="7.5" x2="466.36" y2="1207.5" stroke="#555" stroke-width="15" />
+      <line x1="521.37" y1="7.5" x2="521.37" y2="1207.5" stroke="#555" stroke-width="15" />
+      <line x1="576.37" y1="7.5" x2="576.37" y2="1207.5" stroke="#555" stroke-width="15" />
+      <line x1="631.37" y1="7.5" x2="631.37" y2="1207.5" stroke="#555" stroke-width="15" />
+      <line x1="686.38" y1="7.5" x2="686.38" y2="1207.5" stroke="#555" stroke-width="15" />
+      <line x1="741.38" y1="7.5" x2="741.38" y2="1207.5" stroke="#555" stroke-width="15" />
+      <line x1="796.38" y1="7.5" x2="796.38" y2="1207.5" stroke="#555" stroke-width="15" />
+    </g>
+  </g>
+</svg>
