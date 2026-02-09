@@ -5,6 +5,8 @@
 
 Open-source Python gateway for FAAC E145 gate controllers with MQTT, OpenHAB, and Home Assistant integration.
 
+![FAAC Gateway Web Interface](docs/images/faac_gateway_animated.gif)
+
 ## Features
 
 - Control FAAC E145 gates via serial connection
