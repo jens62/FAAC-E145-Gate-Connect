@@ -13,6 +13,9 @@ env/
 # Config
 config/config.yaml
 
+# Local assets (not for repository)
+local-assets/
+
 # IDE
 .vscode/
 .idea/
