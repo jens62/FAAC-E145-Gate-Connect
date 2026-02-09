@@ -92,3 +92,7 @@ python3 examples/mqtt_simple.py
 # Send commands via MQTT
 mosquitto_pub -t 'faac/gate/command' -m 'open'
 ```
+
+## Related Projects
+
+- [gatecontrol](https://github.com/owahlen/gatecontrol) - Gate control solution for FAAC E124 (protocol compatibility with E145 unknown)
