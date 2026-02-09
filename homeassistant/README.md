@@ -2,6 +2,8 @@
 
 This directory contains Home Assistant configuration files for integrating your FAAC gate via MQTT.
 
+![Home Assistant Dashboard with Gate Control](../docs/images/homeassistant-dashboard.png)
+
 ## Architecture
 
 ```
