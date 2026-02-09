@@ -81,7 +81,8 @@ See [REST API documentation](docs/REST_API.md) for complete API reference, authe
 - **[Installation Guide](scripts/README.md)** - Systemd service setup and log management
 - **[MQTT Setup](MQTT_SETUP.md)** - MQTT broker configuration
 - **[OpenHAB Integration](openhab/README.md)** - OpenHAB configuration and usage
-- [MQTT Integration Guide](docs/MQTT.md) - Home Assistant, OpenHAB, Node-RED
+- **[Home Assistant Integration](homeassistant/README.md)** - Home Assistant configuration with dashboard cards
+- [MQTT Integration Guide](docs/MQTT.md) - General MQTT integration for various platforms
 - [Full Documentation](docs/)
 
 ## Examples
