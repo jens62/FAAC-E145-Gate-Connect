@@ -64,19 +64,36 @@ ssh pi@raspberrypi
 chmod +x /home/pi/faac_control_final.py
 ```
 
-### 3. USB-Port identifizieren
+### 3. USB-Port identifizieren und Treiber einrichten
+
+Das FAAC-Board (`22d3:0000`) wird von Linux automatisch erkannt, benötigt aber zwingend den **`option`-Treiber**. Der Standard-Treiber `cdc_acm` öffnet den Port zwar, sendet aber keine Antworten zurück (TX funktioniert, RX ist tot).
+
+Stabilen Gerätenamen per udev-Regel einrichten (einmalig):
 
 ```bash
-# Alle USB-Geräte anzeigen
-ls -l /dev/ttyUSB*
-
-# Typische Ausgabe:
-# /dev/ttyUSB0  oder  /dev/ttyUSB1
+sudo tee /etc/udev/rules.d/99-faac.rules << 'EOF'
+# option-Treiber erzwingen (cdc_acm liefert kein RX)
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="22d3", ATTRS{idProduct}=="0000", \
+  RUN+="/sbin/modprobe option", \
+  RUN+="/bin/sh -c 'sleep 1; echo 22d3 0000 > /sys/bus/usb-serial/drivers/option1/new_id 2>/dev/null; echo %k:1.0 > /sys/bus/usb/drivers/cdc_acm/unbind 2>/dev/null; echo %k:1.0 > /sys/bus/usb/drivers/option/bind 2>/dev/null'"
+# Stabiler Symlink unabhängig von der ttyUSBx-Nummer
+ACTION=="add", SUBSYSTEM=="tty", ATTRS{idVendor}=="22d3", ATTRS{idProduct}=="0000", \
+  SYMLINK+="faac-gate", MODE="0666", GROUP="dialout"
+EOF
+sudo udevadm control --reload-rules
 ```
 
-**WICHTIG:** Passe im Script die Zeile an:
-```python
-PORT = '/dev/ttyUSB1'  # Ändere zu deinem Port
+Nach USB-Reconnect (oder Neustart) erscheint das Gerät als `/dev/faac-gate`:
+
+```bash
+ls -l /dev/faac-gate
+# lrwxrwxrwx ... /dev/faac-gate -> ttyUSB0
+```
+
+Verwende in `config/config.yaml` den stabilen Namen:
+```yaml
+serial:
+  port: /dev/faac-gate
 ```
 
 ### 4. Starten
@@ -255,6 +272,25 @@ python3 faac_control_final.py -tx -rx -p
 dmesg | grep tty
 ls -l /dev/tty*
 ```
+
+### Problem: TX funktioniert, aber kein RX — Tor reagiert nicht
+
+Der Kernel hat das Board dem `cdc_acm`-Treiber zugewiesen statt `option`. Erkennbar daran, dass `/dev/ttyACM0` statt `/dev/ttyUSB0` erscheint.
+
+```bash
+# Prüfen welcher Treiber aktiv ist
+ls -l /dev/ttyACM* /dev/ttyUSB* 2>/dev/null
+
+# Sofort auf option-Treiber umschalten (ohne Neustart)
+sudo modprobe option
+DEV=$(grep -rl "22d3" /sys/bus/usb/devices/*/idVendor 2>/dev/null \
+  | xargs -I{} dirname {} | xargs -I{} basename {})
+echo "22d3 0000" | sudo tee /sys/bus/usb-serial/drivers/option1/new_id
+echo "${DEV}:1.0" | sudo tee /sys/bus/usb/drivers/cdc_acm/unbind 2>/dev/null || true
+echo "${DEV}:1.0" | sudo tee /sys/bus/usb/drivers/option/bind
+```
+
+Dauerhaft lösen: udev-Regel aus Schritt 3 installieren — dann wird der `option`-Treiber bei jedem Einstecken automatisch verwendet.
 
 ---
 
